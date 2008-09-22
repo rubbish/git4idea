@@ -60,6 +60,7 @@ public class GitRenameListener implements RefactoringElementListener {
 
     public void elementMoved(PsiElement newElement) {
         // implemented in GitVirtualFileAdapter
+        project.getAllScope();
     }
 
 
