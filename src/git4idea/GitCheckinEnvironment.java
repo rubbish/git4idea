@@ -108,7 +108,6 @@ public class GitCheckinEnvironment implements CheckinEnvironment {
                 final ProgressIndicator progress = ProgressManager.getInstance().getProgressIndicator();
                 progress.setIndeterminate(true);
 
-                List<VcsException> exceptions = new ArrayList<VcsException>();
                 Map<VirtualFile, List<Change>> sortedChanges = sortChangesByVcsRoot(changes);
                 
                 if(changeCount == 1)
