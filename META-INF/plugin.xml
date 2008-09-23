@@ -1,14 +1,12 @@
 <!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
 <idea-plugin url="http://plugins.intellij.net/plugin/?id=3033">
     <name>Git4Idea</name>
-    <description>Provides Git version control support for IDEA.
-        Requires external Git command line tool to function. Cygwin is recommended on Windows.
-        Configure the location of the 'git' command in the project settings Version Control tab using the
-        "Configure VCS" button for the Git VCS.
-
-        NOTE: Not compatible with IDEA v8, a new version of Git4Idea will ship with IDEA v8.
+    <description>Provides Git version control integration for IDEA. Basic Git operations may be performed
+        easily from inside IDEA. A Git toolbar and full refactoring support are also included. Git4Idea requires 
+        an external Git command line tool to function. Cygwin is recommended on Windows.
     </description>
-    <change-notes>Version 1.6 fixes a few minor issues, added a Git toolbar and incorporated an internal package refactoring.</change-notes>
+    <change-notes>Version 1.6 fixes a few minor issues, adds a Git toolbar and incorporates an internal package
+        refactoring.</change-notes>
     <version>1.6</version>
     <vendor url="http://github.com/markscott/git4idea/tree/master" email="mscott@mqsoftware.com">MQSoftware</vendor>
     <idea-version since-build="5000" until-build="7999"/>
