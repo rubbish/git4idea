@@ -6,12 +6,10 @@
         Configure the location of the 'git' command in the project settings Version Control tab using the
         "Configure VCS" button for the Git VCS.
 
-        NOTE: Not compatible with IDEA v8, a new version of Git4Idea will likely ship with the final IDEA v8.
+        NOTE: Not compatible with IDEA v8, a new version of Git4Idea will ship with IDEA v8.
     </description>
-    <change-notes>Version 1.5 fixes several bugs as well as greatly enhances performance and stability. An intermittent
-        IDEA deadlock that some users were experiencing in v1.4 is also fixed. Current users are strongly encouraged to
-        update to this version.</change-notes>
-    <version>1.5</version>
+    <change-notes>Version 1.6 fixes a few minor issues, added a Git toolbar and incorporated an internal package refactoring.</change-notes>
+    <version>1.6</version>
     <vendor url="http://github.com/markscott/git4idea/tree/master" email="mscott@mqsoftware.com">MQSoftware</vendor>
     <idea-version since-build="5000" until-build="7999"/>
     <application-components>
@@ -25,12 +23,12 @@
             <add-to-group group-id="VcsGroups" anchor="last"/>
         </action>
         <group id="Git.Menu" class="git4idea.actions.GitMenu" popup="true" text="Git">
-            <action id="Git.CurrentBranch" class="git4idea.actions.CurrentBranch" text="Current Branch"/>
-            <action id="Git.Checkout" class="git4idea.actions.Checkout" text="Checkout Branch" icon="/resources/icons/checkout.png"/>
+            <action id="Git.CurrentBranch" class="git4idea.actions.CurrentBranch" text="Current Branch" icon="/resources/icons/annotate.png"/>
+            <action id="Git.Checkout" class="git4idea.actions.Checkout" text="Checkout Branch" icon="/resources/icons/branchDiff.png"/>
             <action id="Git.Add" class="git4idea.actions.Add" text="Add File" icon="/resources/icons/add.png">
                 <keyboard-shortcut first-keystroke="control alt A" keymap="$default"/>
             </action>
-            <action id="Git.Revert" class="git4idea.actions.Revert" text="Revert File" icon="/resources/icons/rollback.png">
+            <action id="Git.Revert" class="git4idea.actions.Revert" text="Revert File" icon="/resources/icons/reset.png">
                 <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
             </action>
             <action id="Git.Delete" class="git4idea.actions.Delete" text="Delete File" icon="/resources/icons/remove.png">
@@ -38,28 +36,27 @@
             </action>
             <reference id="Annotate" />
             <separator/>
-            <reference id="CheckinFiles"/>
+            <reference id="CheckinFiles" />
             <reference id="CheckinProject"/>
             <reference id="Compare.LastVersion"/>
             <reference id="Compare.Selected"/>
             <reference id="Vcs.ShowTabbedFileHistory"/>
-            <action id="Git.RevisionGraph" class="git4idea.actions.RevisionGraph" text="Show Revision Graph"/>
+            <action id="Git.RevisionGraph" class="git4idea.actions.RevisionGraph" text="Show Revision Graph" icon="/resources/icons/browse.png"/>
             <separator/>
-            <action id="Git.Tag" class="git4idea.actions.Tag" text="Tag Files"/>
-            <action id="Git.Fetch" class="git4idea.actions.Fetch" text="Fetch Changes" icon="/resources/icons/update.png"/>
-            <action id="Git.Pull" class="git4idea.actions.Pull" text="Pull Changes" icon="/resources/icons/update.png"/>
-            <action id="Git.Merge" class="git4idea.actions.Merge" text="Merge Changes" icon="/resources/icons/update.png"/>
-            <action id="Git.MergeTool" class="git4idea.actions.MergeTool" text="Merge Tool"/>
-            <action id="Git.Push" class="git4idea.actions.Push" text="Push Changes"/>
-            <action id="Git.Stash" class="git4idea.actions.Stash" text="Stash Changes"/>
-            <action id="Git.Unstash" class="git4idea.actions.Unstash" text="UnStash Changes"/>
+            <action id="Git.Tag" class="git4idea.actions.Tag" text="Tag Files" icon="/resources/icons/properties.png" />
+            <action id="Git.Fetch" class="git4idea.actions.Fetch" text="Fetch Changes" icon="/resources/icons/hideSideDown.png"/>
+            <action id="Git.Pull" class="git4idea.actions.Pull" text="Pull Changes" icon="/resources/icons/pull.png"/>
+            <action id="Git.Merge" class="git4idea.actions.Merge" text="Merge Changes" icon="/resources/icons/merge.png"/>
+            <action id="Git.MergeTool" class="git4idea.actions.MergeTool" text="Merge Tool" icon="/resources/icons/applyNotConflicts.png"/>
+            <action id="Git.Push" class="git4idea.actions.Push" text="Push Changes" icon="/resources/icons/push.png"/>
+            <action id="Git.Stash" class="git4idea.actions.Stash" text="Stash Changes" icon="/resources/icons/stash.png"/>
+            <action id="Git.Unstash" class="git4idea.actions.Unstash" text="UnStash Changes" icon="/resources/icons/unstash.png"/>
             <separator/>
-            
             <add-to-group group-id="VcsGroup" anchor="last"/>
             <add-to-group group-id="VcsGroups" anchor="last"/>
-            <!--           <add-to-group anchor="last" group-id="VcsGlobalGroup" /> -->
         </group>
         <group description="Git Toolbar" text="Git Toolbar" >
+            <reference id="Git.CurrentBranch" />
             <reference id="Git.Checkout" />
             <reference id="CheckinProject" />
             <reference id="Vcs.ShowTabbedFileHistory"/>
