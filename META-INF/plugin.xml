@@ -16,12 +16,12 @@
     <idea-version since-build="5000" until-build="7999"/>
     <application-components>
         <component>
-            <implementation-class>git4idea.GitFileSystem</implementation-class>
+            <implementation-class>git4idea.vfs.GitFileSystem</implementation-class>
         </component>
     </application-components>
 
     <actions>
-        <action id="Git.Clone" class="git4idea.actions.GitClone" text="Git Clone a Repository">
+        <action id="Git.Clone" class="git4idea.actions.CloneRepo" text="Git Clone a Repository">
             <add-to-group group-id="VcsGroups" anchor="last"/>
         </action>
         <group id="Git.Menu" class="git4idea.actions.GitMenu" popup="true" text="Git">
@@ -34,20 +34,20 @@
             <reference id="Compare.LastVersion"/>
             <reference id="Compare.Selected"/>
             <reference id="Vcs.ShowTabbedFileHistory"/>
-            <action id="Git.RevisionGraph" class="git4idea.actions.GitRevisionGraph" text="Show Revision Graph"/>
+            <action id="Git.RevisionGraph" class="git4idea.actions.RevisionGraph" text="Show Revision Graph"/>
             <!-- <reference id="Vcs.ShowHistoryForBlock"/>  -->
             <!-- <reference id="ChangesView.Browse"/>   -->
             <separator/>
 
-            <action id="Git.CurrentBranch" class="git4idea.actions.GitCurrentBranch" text="Current Branch"/>
-            <action id="Git.Checkout" class="git4idea.actions.GitCheckout" text="Checkout Branch"/>
-            <action id="Git.Add" class="git4idea.actions.GitAdd" text="Add File">
+            <action id="Git.CurrentBranch" class="git4idea.actions.CurrentBranch" text="Current Branch"/>
+            <action id="Git.Checkout" class="git4idea.actions.Checkout" text="Checkout Branch"/>
+            <action id="Git.Add" class="git4idea.actions.Add" text="Add File">
                 <keyboard-shortcut first-keystroke="control alt A" keymap="$default"/>
             </action>
-            <action id="Git.Revert" class="git4idea.actions.GitRevert" text="Revert File">
+            <action id="Git.Revert" class="git4idea.actions.Revert" text="Revert File">
                 <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
             </action>
-            <action id="Git.Delete" class="git4idea.actions.GitDelete" text="Delete File">
+            <action id="Git.Delete" class="git4idea.actions.Delete" text="Delete File">
                 <keyboard-shortcut first-keystroke="control alt D" keymap="$default"/>
             </action>
             <!--<action id="Resolve" class="org.jetbrains.idea.perforce.actions.ResolveAction"/>-->
@@ -55,14 +55,14 @@
             <!-- <action id="TimeLapseView" class="org.jetbrains.idea.perforce.actions.TimeLapseViewAction"/> -->
             <separator/>
 
-            <action id="Git.Tag" class="git4idea.actions.GitTag" text="Tag Files"/>
-            <action id="Git.Fetch" class="git4idea.actions.GitFetch" text="Fetch Changes"/>
-            <action id="Git.Pull" class="git4idea.actions.GitPull" text="Pull Changes"/>
-            <action id="Git.Merge" class="git4idea.actions.GitMerge" text="Merge Changes"/>
-            <action id="Git.MergeTool" class="git4idea.actions.GitMergeTool" text="Merge Tool"/>
-            <action id="Git.Push" class="git4idea.actions.GitPush" text="Push Changes"/>
-            <action id="Git.Stash" class="git4idea.actions.GitStash" text="Stash Changes"/>
-            <action id="Git.Unstash" class="git4idea.actions.GitUnstash" text="UnStash Changes"/>
+            <action id="Git.Tag" class="git4idea.actions.Tag" text="Tag Files"/>
+            <action id="Git.Fetch" class="git4idea.actions.Fetch" text="Fetch Changes"/>
+            <action id="Git.Pull" class="git4idea.actions.Pull" text="Pull Changes"/>
+            <action id="Git.Merge" class="git4idea.actions.Merge" text="Merge Changes"/>
+            <action id="Git.MergeTool" class="git4idea.actions.MergeTool" text="Merge Tool"/>
+            <action id="Git.Push" class="git4idea.actions.Push" text="Push Changes"/>
+            <action id="Git.Stash" class="git4idea.actions.Stash" text="Stash Changes"/>
+            <action id="Git.Unstash" class="git4idea.actions.Unstash" text="UnStash Changes"/>
             <separator/>
             
             <add-to-group group-id="VcsGroup" anchor="last"/>
@@ -75,27 +75,27 @@
         <vcs name="Git" vcsClass="git4idea.GitVcs"/>
 
         <projectService
-                serviceInterface="git4idea.GitAnnotationProvider"
-                serviceImplementation="git4idea.GitAnnotationProvider"/>
+                serviceInterface="git4idea.providers.GitAnnotationProvider"
+                serviceImplementation="git4idea.providers.GitAnnotationProvider"/>
         <projectService
-                serviceInterface="git4idea.GitDiffProvider"
-                serviceImplementation="git4idea.GitDiffProvider"/>
+                serviceInterface="git4idea.providers.GitDiffProvider"
+                serviceImplementation="git4idea.providers.GitDiffProvider"/>
         <projectService
-                serviceInterface="git4idea.GitCheckinEnvironment"
-                serviceImplementation="git4idea.GitCheckinEnvironment"/>
+                serviceInterface="git4idea.envs.GitCheckinEnvironment"
+                serviceImplementation="git4idea.envs.GitCheckinEnvironment"/>
         <projectService
-                serviceInterface="git4idea.GitChangeProvider"
-                serviceImplementation="git4idea.GitChangeProvider"/>
+                serviceInterface="git4idea.providers.GitChangeProvider"
+                serviceImplementation="git4idea.providers.GitChangeProvider"/>
         <projectService
-                serviceInterface="git4idea.GitHistoryProvider"
-                serviceImplementation="git4idea.GitHistoryProvider"/>
+                serviceInterface="git4idea.providers.GitHistoryProvider"
+                serviceImplementation="git4idea.providers.GitHistoryProvider"/>
         <projectService
-                serviceInterface="git4idea.GitRollbackEnvironment"
-                serviceImplementation="git4idea.GitRollbackEnvironment"/>
+                serviceInterface="git4idea.envs.GitRollbackEnvironment"
+                serviceImplementation="git4idea.envs.GitRollbackEnvironment"/>
         <projectService
-                serviceInterface="git4idea.GitVcsSettings"
-                serviceImplementation="git4idea.GitVcsSettings"/>
-        <fileEditorProvider implementation="git4idea.GitRevisionGraphEditorProvider"/>
+                serviceInterface="git4idea.config.GitVcsSettings"
+                serviceImplementation="git4idea.config.GitVcsSettings"/>
+        <fileEditorProvider implementation="git4idea.providers.GitRevisionGraphEditorProvider"/>
 
     </extensions>
 

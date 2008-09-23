@@ -52,6 +52,21 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Date;
 import java.util.Iterator;
 
+import git4idea.providers.GitAnnotationProvider;
+import git4idea.providers.GitChangeProvider;
+import git4idea.providers.GitDiffProvider;
+import git4idea.providers.GitHistoryProvider;
+import git4idea.providers.GitRefactoringListenerProvider;
+import git4idea.vfs.GitRevisionNumber;
+import git4idea.vfs.GitRevisionSelector;
+import git4idea.vfs.GitVirtualFile;
+import git4idea.vfs.GitVirtualFileAdapter;
+import git4idea.envs.GitCheckinEnvironment;
+import git4idea.envs.GitRollbackEnvironment;
+import git4idea.envs.GitUpdateEnvironment;
+import git4idea.config.GitVcsConfigurable;
+import git4idea.config.GitVcsSettings;
+
 /**
  * Git VCS implementation
  */
@@ -216,7 +231,7 @@ public class GitVcs extends AbstractVcs implements Disposable {
         VirtualFileManager.getInstance().addVirtualFileListener(gitFileAdapter, activationDisposable);
         LocalFileSystem.getInstance().registerAuxiliaryFileOperationsHandler(gitFileAdapter);
         RefactoringListenerManager.getInstance(myProject).addListenerProvider(renameListenerProvider);
-//        GitChangeMonitor mon = GitChangeMonitor.getInstance();
+//        ChangeMonitor mon = ChangeMonitor.getInstance();
 //        mon.setProject(myProject);
 //        mon.setGitVcsSettings(settings);
 //        mon.start();
@@ -231,7 +246,7 @@ public class GitVcs extends AbstractVcs implements Disposable {
         assert activationDisposable != null;
         Disposer.dispose(activationDisposable);
         activationDisposable = null;
-//        GitChangeMonitor.getInstance().stopRunning();
+//        ChangeMonitor.getInstance().stopRunning();
     }
 
     @NotNull

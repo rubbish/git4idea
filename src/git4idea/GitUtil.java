@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import git4idea.vfs.GitFileSystem;
+
 /**
  * Git utility/helper methods
  */

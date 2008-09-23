@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.nio.charset.Charset;
 
 import org.jetbrains.annotations.NotNull;
-import git4idea.GitVcsSettings;
+import git4idea.config.GitVcsSettings;
 import git4idea.GitVcs;
 
 /**
