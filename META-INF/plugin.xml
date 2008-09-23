@@ -1,5 +1,5 @@
 <!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
-<idea-plugin>
+<idea-plugin url="http://plugins.intellij.net/plugin/?id=3033">
     <name>Git4Idea</name>
     <description>Provides Git version control support for IDEA.
         Requires external Git command line tool to function. Cygwin is recommended on Windows.
@@ -25,40 +25,30 @@
             <add-to-group group-id="VcsGroups" anchor="last"/>
         </action>
         <group id="Git.Menu" class="git4idea.actions.GitMenu" popup="true" text="Git">
+            <action id="Git.CurrentBranch" class="git4idea.actions.CurrentBranch" text="Current Branch"/>
+            <action id="Git.Checkout" class="git4idea.actions.Checkout" text="Checkout Branch" icon="/resources/icons/checkout.png"/>
+            <action id="Git.Add" class="git4idea.actions.Add" text="Add File" icon="/resources/icons/add.png">
+                <keyboard-shortcut first-keystroke="control alt A" keymap="$default"/>
+            </action>
+            <action id="Git.Revert" class="git4idea.actions.Revert" text="Revert File" icon="/resources/icons/rollback.png">
+                <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
+            </action>
+            <action id="Git.Delete" class="git4idea.actions.Delete" text="Delete File" icon="/resources/icons/remove.png">
+                <keyboard-shortcut first-keystroke="control alt D" keymap="$default"/>
+            </action>
+            <reference id="Annotate" />
+            <separator/>
             <reference id="CheckinFiles"/>
-            <!-- <reference id="CheckinProject"/>
-            <reference id="UpdateFiles"/>
-            <reference id="Compare.SameVersion"/>
-            <reference id="IntegrateFiles"/>  -->
-            <reference id="Annotate"/>
+            <reference id="CheckinProject"/>
             <reference id="Compare.LastVersion"/>
             <reference id="Compare.Selected"/>
             <reference id="Vcs.ShowTabbedFileHistory"/>
             <action id="Git.RevisionGraph" class="git4idea.actions.RevisionGraph" text="Show Revision Graph"/>
-            <!-- <reference id="Vcs.ShowHistoryForBlock"/>  -->
-            <!-- <reference id="ChangesView.Browse"/>   -->
             <separator/>
-
-            <action id="Git.CurrentBranch" class="git4idea.actions.CurrentBranch" text="Current Branch"/>
-            <action id="Git.Checkout" class="git4idea.actions.Checkout" text="Checkout Branch"/>
-            <action id="Git.Add" class="git4idea.actions.Add" text="Add File">
-                <keyboard-shortcut first-keystroke="control alt A" keymap="$default"/>
-            </action>
-            <action id="Git.Revert" class="git4idea.actions.Revert" text="Revert File">
-                <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
-            </action>
-            <action id="Git.Delete" class="git4idea.actions.Delete" text="Delete File">
-                <keyboard-shortcut first-keystroke="control alt D" keymap="$default"/>
-            </action>
-            <!--<action id="Resolve" class="org.jetbrains.idea.perforce.actions.ResolveAction"/>-->
-            <!--<action id="ResolveAll" class="org.jetbrains.idea.perforce.actions.ResolveAllAction"/>-->
-            <!-- <action id="TimeLapseView" class="org.jetbrains.idea.perforce.actions.TimeLapseViewAction"/> -->
-            <separator/>
-
             <action id="Git.Tag" class="git4idea.actions.Tag" text="Tag Files"/>
-            <action id="Git.Fetch" class="git4idea.actions.Fetch" text="Fetch Changes"/>
-            <action id="Git.Pull" class="git4idea.actions.Pull" text="Pull Changes"/>
-            <action id="Git.Merge" class="git4idea.actions.Merge" text="Merge Changes"/>
+            <action id="Git.Fetch" class="git4idea.actions.Fetch" text="Fetch Changes" icon="/resources/icons/update.png"/>
+            <action id="Git.Pull" class="git4idea.actions.Pull" text="Pull Changes" icon="/resources/icons/update.png"/>
+            <action id="Git.Merge" class="git4idea.actions.Merge" text="Merge Changes" icon="/resources/icons/update.png"/>
             <action id="Git.MergeTool" class="git4idea.actions.MergeTool" text="Merge Tool"/>
             <action id="Git.Push" class="git4idea.actions.Push" text="Push Changes"/>
             <action id="Git.Stash" class="git4idea.actions.Stash" text="Stash Changes"/>
@@ -69,6 +59,25 @@
             <add-to-group group-id="VcsGroups" anchor="last"/>
             <!--           <add-to-group anchor="last" group-id="VcsGlobalGroup" /> -->
         </group>
+        <group description="Git Toolbar" text="Git Toolbar" >
+            <reference id="Git.Checkout" />
+            <reference id="CheckinProject" />
+            <reference id="Vcs.ShowTabbedFileHistory"/>
+            <reference id="Git.Tag" />
+            <reference id="Git.Fetch"  />
+            <reference id="Git.Pull"  />
+            <reference id="Git.Merge"  />
+            <reference id="Git.MergeTool"  />
+            <reference id="Git.Push"  />
+            <reference id="Git.Stash"  />
+            <reference id="Git.Unstash"  />
+            <separator/>
+            <reference id="Git.Add"  />
+            <reference id="Git.Revert"  />
+            <reference id="Git.Delete"  />
+            <separator/>
+            <add-to-group group-id="MainToolBar" relative-to-action="HelpTopics" anchor="before"/>
+        </group>
     </actions>
 
     <extensions xmlns="com.intellij" defaultExtensionNs="com.intellij">
@@ -76,26 +85,26 @@
 
         <projectService
                 serviceInterface="git4idea.providers.GitAnnotationProvider"
-                serviceImplementation="git4idea.providers.GitAnnotationProvider"/>
+                serviceImplementation="git4idea.providers.GitAnnotationProvider" icon="/resources/icons/annotate.png"/>
         <projectService
                 serviceInterface="git4idea.providers.GitDiffProvider"
-                serviceImplementation="git4idea.providers.GitDiffProvider"/>
+                serviceImplementation="git4idea.providers.GitDiffProvider" icon="/resources/icons/diff.png"/>
         <projectService
                 serviceInterface="git4idea.envs.GitCheckinEnvironment"
-                serviceImplementation="git4idea.envs.GitCheckinEnvironment"/>
+                serviceImplementation="git4idea.envs.GitCheckinEnvironment" icon="/resources/icons/commit.png"/>
         <projectService
                 serviceInterface="git4idea.providers.GitChangeProvider"
-                serviceImplementation="git4idea.providers.GitChangeProvider"/>
+                serviceImplementation="git4idea.providers.GitChangeProvider" icon="/resources/icons/allRevisions.png"/>
         <projectService
                 serviceInterface="git4idea.providers.GitHistoryProvider"
-                serviceImplementation="git4idea.providers.GitHistoryProvider"/>
+                serviceImplementation="git4idea.providers.GitHistoryProvider" icon="/resources/icons/showHistory.png"/>
         <projectService
                 serviceInterface="git4idea.envs.GitRollbackEnvironment"
-                serviceImplementation="git4idea.envs.GitRollbackEnvironment"/>
+                serviceImplementation="git4idea.envs.GitRollbackEnvironment" icon="/resources/icons/rollback.png"/>
         <projectService
                 serviceInterface="git4idea.config.GitVcsSettings"
-                serviceImplementation="git4idea.config.GitVcsSettings"/>
-        <fileEditorProvider implementation="git4idea.providers.GitRevisionGraphEditorProvider"/>
+                serviceImplementation="git4idea.config.GitVcsSettings" icon="/resources/icons/cvs.png"/>
+        <fileEditorProvider implementation="git4idea.providers.GitRevisionGraphEditorProvider" icon="/resources/icons/browse.png"/>
 
     </extensions>
 

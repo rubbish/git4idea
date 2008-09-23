@@ -75,7 +75,7 @@ public class GitCommand {
     public static final String EMPTY_STRING = "";
     /* Git/VCS commands */
     private static final String ADD_CMD = "add";
-    private static final String ANNOTATE_CMD = "annotate";
+    private static final String ANNOTATE_CMD = "blame";
     private static final String BRANCH_CMD = "branch";
     public static final String CHECKOUT_CMD = "checkout";
     public static final String CLONE_CMD = "clone";
@@ -379,7 +379,10 @@ public class GitCommand {
     public List<VcsFileRevision> log(FilePath filePath) throws VcsException {
         String[] options = new String[]
                 {
-                        "-n25",
+                        "-C",
+                        "-l5",
+                        "--find-copies-harder",
+                        "-n50",
                         "--pretty=format:%H@@@%an <%ae>@@@%ct@@@%s",
                         "--"
                 };
@@ -920,7 +923,7 @@ public class GitCommand {
      *          If it fails...
      */
     public GitFileAnnotation annotate(FilePath filePath) throws VcsException {
-        String[] options = new String[]{"-l", "--"};
+        String[] options = new String[]{"-c", "-C", "-l", "--"};
         String[] args = new String[]{getRelativeFilePath(filePath.getPath(), vcsRoot)};
 
         GitFileAnnotation annotation = new GitFileAnnotation(project);
