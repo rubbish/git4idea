@@ -40,7 +40,7 @@ import java.util.Collection;
  */
 public class ShowAllSubmittedFiles extends AnAction {
     public ShowAllSubmittedFiles() {
-        super(GitBundle.message("action.text.show.all.submitted"), null, IconLoader.getIcon("/resources/icons/allRevisions.png"));
+        super(GitBundle.message("action.text.show.all.submitted"), null, IconLoader.getIcon("/git4idea/icons/allRevisions.png"));
     }
 
     public void update(AnActionEvent e) {
