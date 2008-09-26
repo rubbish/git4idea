@@ -13,6 +13,7 @@ package git4idea.changes;
  * Authors: Mark Scott
  */
 
+
 import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vcs.changes.Change;
 
