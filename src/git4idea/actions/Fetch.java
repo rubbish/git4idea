@@ -24,11 +24,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.progress.ProgressManager;
 import git4idea.GitVcs;
-import git4idea.actions.GitBranch;
+import git4idea.GitUtil;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandRunnable;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Git "fetch" action
@@ -39,7 +40,14 @@ public class Fetch extends BasicAction {
                            @NotNull VirtualFile[] affectedFiles) throws VcsException {
         saveAll();
 
-        final VirtualFile[] roots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+        final Set<VirtualFile> roots = GitUtil.getVcsRootsForFiles(project,affectedFiles);
+         if (roots.size() == 0) {
+            VirtualFile[] proots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+            for (VirtualFile root : proots) {
+                if (root != null)
+                    roots.add(root);
+            }
+        }
         for (VirtualFile root : roots) {
             GitCommand command = new GitCommand(project, vcs.getSettings(), root);
 
@@ -49,8 +57,8 @@ public class Fetch extends BasicAction {
                 initialValue = command.remoteRepoURL(rbranches.get(0));
             }
             String repoURL = Messages.showInputDialog(project,
-                    "Enter remote repository URL to fetch (empty for default):",
-                    "Fetch URL", Messages.getQuestionIcon(), initialValue, null);
+                    "Enter remote repository name or URL to fetch (empty for default):",
+                    "Fetch URL --> " + root.getPath(), Messages.getQuestionIcon(), initialValue, null);
 
             GitCommandRunnable cmdr = new GitCommandRunnable(project, vcs.getSettings(), root);
             cmdr.setCommand(GitCommand.FETCH_CMD);

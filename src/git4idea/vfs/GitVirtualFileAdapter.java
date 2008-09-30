@@ -306,6 +306,11 @@ public class GitVirtualFileAdapter extends VirtualFileAdapter implements LocalFi
         return ignoreFiles.contains(file.getPath());
     }
 
+    /** Returns the current list of ignored files for this project. */
+    public Set<String> getIgnoreFiles() {
+        return ignoreFiles;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private methods
 

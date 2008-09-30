@@ -204,6 +204,7 @@ public class GitVirtualFile extends VirtualFile {
         DELETED,
         UNMERGED,
         UNMODIFIED,
-        UNVERSIONED
+        UNVERSIONED,
+        IGNORED
     }
 }

@@ -17,6 +17,7 @@ package git4idea.actions;
  * This code was originally derived from the MKS & Mercurial IDEA VCS plugins
  */
 import git4idea.GitVcs;
+import git4idea.GitUtil;
 import git4idea.actions.GitBranch;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandRunnable;
@@ -30,6 +31,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.progress.ProgressManager;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Git "pull" action
@@ -40,7 +42,14 @@ public class Pull extends BasicAction {
                            @NotNull VirtualFile[] affectedFiles) throws VcsException {
         saveAll();
 
-        final VirtualFile[] roots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+        final Set<VirtualFile> roots = GitUtil.getVcsRootsForFiles(project,affectedFiles);
+         if (roots.size() == 0) {
+            VirtualFile[] proots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+            for (VirtualFile root : proots) {
+                if (root != null)
+                    roots.add(root);
+            }
+        }
         for (VirtualFile root : roots) {
             GitCommand command = new GitCommand(project, vcs.getSettings(), root);
 
@@ -50,8 +59,8 @@ public class Pull extends BasicAction {
                 initialValue = command.remoteRepoURL(rbranches.get(0));
             }
             String repoURL = Messages.showInputDialog(project,
-                    "Enter remote repository URL to pull/merge (empty for default):",
-                    "Pull URL", Messages.getQuestionIcon(), initialValue, null);
+                    "Enter remote repository name or URL to pull/merge (empty for default):",
+                    "Pull URL --> " + root.getPath(), Messages.getQuestionIcon(), initialValue, null);
 
             GitCommandRunnable cmdr = new GitCommandRunnable(project, vcs.getSettings(), root);
             cmdr.setCommand(GitCommand.FETCH_CMD);
@@ -95,8 +104,7 @@ public class Pull extends BasicAction {
 
             selectedBranch = branches.get(branchNum);
             cmdr.setCommand(GitCommand.MERGE_CMD);
-            cmdr.setArgs( new String[] { selectedBranch.getName() });
-            //TODO: make this async so the git command output can be seen in the version control window as it happens...
+            cmdr.setArgs( new String[] { "--strategy=resolve", selectedBranch.getName() });
             manager.runProcessWithProgressSynchronously(cmdr, "Merging branch " + selectedBranch.getName(), false, project);
             ex = cmdr.getException();
             if(ex != null)  {

@@ -13,21 +13,21 @@ package git4idea.actions;
  * Authors: Mark Scott
  */
 
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vcs.AbstractVcs;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
+import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.progress.ProgressManager;
-import git4idea.GitVcs;
 import git4idea.GitUtil;
+import git4idea.GitVcs;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Git stash action
@@ -40,18 +40,17 @@ public class Stash extends BasicAction {
         if (!ProjectLevelVcsManager.getInstance(project).checkAllFilesAreUnder(GitVcs.getInstance(project), affectedFiles))
             return;
 
-        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, affectedFiles);
+        final Set<VirtualFile> roots = GitUtil.getVcsRootsForFiles(project, affectedFiles);
 
-        String stashName = Messages.showInputDialog(project,
-                "Enter new stash name/description: ",
-                "Stash", Messages.getQuestionIcon(), "", null);
+        for (VirtualFile root : roots) {
+            String stashName = Messages.showInputDialog(project,
+                    "Enter new stash name/description: ",
+                    "Stash for " + root.getPath(), Messages.getQuestionIcon(), "", null);
 
-        if (stashName == null || stashName.length() == 0) return;
-
-        for (VirtualFile root : roots.keySet()) {
+            if (stashName == null || stashName.length() == 0) continue;
             GitCommandRunnable cmdr = new GitCommandRunnable(project, vcs.getSettings(), root);
             cmdr.setCommand(GitCommand.STASH_CMD);
-            cmdr.setArgs(new String[]{ "save", stashName} );
+            cmdr.setArgs(new String[]{"save", stashName});
 
             ProgressManager manager = ProgressManager.getInstance();
             //TODO: make this async so the git command output can be seen in the version control window as it happens...

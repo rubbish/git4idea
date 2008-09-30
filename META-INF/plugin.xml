@@ -2,12 +2,12 @@
 <idea-plugin url="http://plugins.intellij.net/plugin/?id=3033">
     <name>Git4Idea</name>
     <description>Provides Git version control integration for IDEA. Basic Git operations may be performed
-        easily from inside IDEA. A Git toolbar and full refactoring support are also included. Git4Idea requires 
-        an external Git command line tool to function. Cygwin is recommended on Windows.
+        easily from inside IDEA. A Git toolbar, full merging and refactoring support are also included. Git4Idea requires 
+        an external Git command line tool to function.
     </description>
-    <change-notes>Version 1.6 fixes a few minor issues, adds a Git toolbar and incorporates an internal package
-        refactoring.</change-notes>
-    <version>1.6</version>
+    <change-notes>Version 2.2 fixes a few minor issues and adds support for the IDEA 3-way merge tool.
+    </change-notes>
+    <version>2.2</version>
     <vendor url="http://github.com/markscott/git4idea/tree/master" email="mscott@mqsoftware.com">MQSoftware</vendor>
     <idea-version since-build="5000" until-build="7999"/>
     <application-components>
@@ -84,6 +84,9 @@
         <projectService
                 serviceInterface="git4idea.providers.GitDiffProvider"
                 serviceImplementation="git4idea.providers.GitDiffProvider" icon="/git4idea/icons/diff.png"/>
+        <projectService
+                serviceInterface="git4idea.providers.GitMergeProvider"
+                serviceImplementation="git4idea.providers.GitMergeProvider" icon="/git4idea/icons/applyNotConflicts.png"/>
         <projectService
                 serviceInterface="git4idea.envs.GitCheckinEnvironment"
                 serviceImplementation="git4idea.envs.GitCheckinEnvironment" icon="/git4idea/icons/commit.png"/>

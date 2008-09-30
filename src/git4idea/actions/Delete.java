@@ -21,6 +21,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.AbstractVcs;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vcs.VcsShowConfirmationOption;
+import com.intellij.openapi.vcs.AbstractVcsHelper;
 import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import git4idea.GitUtil;
@@ -32,11 +34,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Git "delete" action
  */
 public class Delete extends BasicAction {
+    private static final String DELETE_TITLE = "Delete file";
+    private static final String DELETE_MESSAGE = "Delete file(s) from Git?\n{0}";
+
     @Override
     public void perform(@NotNull Project project, GitVcs vcs, @NotNull List<VcsException> exceptions,
                         @NotNull VirtualFile[] affectedFiles) throws VcsException {
@@ -45,7 +53,17 @@ public class Delete extends BasicAction {
         if (!ProjectLevelVcsManager.getInstance(project).checkAllFilesAreUnder(GitVcs.getInstance(project), affectedFiles))
             return;
 
-        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, affectedFiles);
+        List<VirtualFile> files = new ArrayList<VirtualFile>();
+        files.addAll(Arrays.asList(affectedFiles));
+        Collection<VirtualFile> filesToDelete;
+        VcsShowConfirmationOption option = vcs.getAddConfirmation();
+        AbstractVcsHelper helper = AbstractVcsHelper.getInstance(project);
+        filesToDelete = helper.selectFilesToProcess(files, DELETE_TITLE, null, DELETE_TITLE, DELETE_MESSAGE, option);
+
+        if (filesToDelete == null || filesToDelete.size() == 0)
+            return;
+
+        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, filesToDelete);
 
         for (VirtualFile root : roots.keySet()) {
             GitCommand command = new GitCommand(project, vcs.getSettings(), root);

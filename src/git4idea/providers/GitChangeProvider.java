@@ -17,6 +17,7 @@ package git4idea.providers;
  * This code was originally derived from the MKS & Mercurial IDEA VCS plugins
  */
 
+import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.FileStatus;
@@ -29,12 +30,12 @@ import com.intellij.openapi.vcs.changes.CurrentContentRevision;
 import com.intellij.openapi.vcs.changes.VcsDirtyScope;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.vcsUtil.VcsUtil;
+import git4idea.changes.ChangeMonitor;
 import git4idea.commands.GitCommand;
 import git4idea.config.GitVcsSettings;
-import git4idea.vfs.GitVirtualFile;
-import git4idea.changes.ChangeMonitor;
 import git4idea.vfs.GitContentRevision;
 import git4idea.vfs.GitRevisionNumber;
+import git4idea.vfs.GitVirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -56,16 +57,56 @@ public class GitChangeProvider implements ChangeProvider {
     @Override
     public void getChanges(VcsDirtyScope dirtyScope, ChangelistBuilder builder, ProgressIndicator progress) throws VcsException {
         Collection<VirtualFile> roots = dirtyScope.getAffectedContentRoots();
+        ChangeMonitor mon = ChangeMonitor.getInstance(project);
+        FileTypeManager ftm = FileTypeManager.getInstance();
         for (VirtualFile root : roots) {
             GitCommand command = new GitCommand(project, settings, root);
-            final Set<GitVirtualFile> files = command.gitCachedFiles();
+
+            // process Git cached/indexed files
+            Set<GitVirtualFile> files = command.gitCachedFiles();
             for (GitVirtualFile file : files) {
+                 if (ftm.isFileIgnored(file.getPath())) {     // IDEA (not Git) is configured to ignore this file
+                        builder.processIgnoredFile(file);
+                     continue;
+                 }
                 Change c = getChange(file);
                 if (c != null)
                     builder.processChange(c);
             }
+            // process Git uncached modified files
+            Set<String> unCachedFilenames = mon.getUncachedFiles(root);
+            if (unCachedFilenames != null && unCachedFilenames.size() > 0) {
+                for (String filename : unCachedFilenames) {
+                    if (filename == null || ftm.isFileIgnored(filename)) continue;
+                    GitVirtualFile file = new GitVirtualFile(project, filename, GitVirtualFile.Status.MODIFIED);
+                    Change c = getChange(file);
+                    if (c != null)
+                        builder.processChange(c);
+                }
+            }
+            // process Git unversioned files
+            Set<String> otherFilenames = mon.getOtherFiles(root);
+            if (otherFilenames != null && otherFilenames.size() > 0) {
+                for (String filename : otherFilenames) {
+                    if (filename == null) continue;
+                    if (ftm.isFileIgnored(filename)) // IDEA (not Git) is configured to ignore this file
+                        builder.processIgnoredFile(
+                                new GitVirtualFile(project, filename, GitVirtualFile.Status.IGNORED));
+                    else
+                        builder.processUnversionedFile(
+                                new GitVirtualFile(project, filename, GitVirtualFile.Status.UNVERSIONED));
+                }
+            }
+            // process Git configured ignored files
+            Set<String> ignoredFilenames = mon.getIgnoredFiles(root);
+            if (ignoredFilenames != null && ignoredFilenames.size() > 0) {
+                for (String filename : ignoredFilenames) {
+                    if (filename == null) continue;
+                        builder.processIgnoredFile(
+                                new GitVirtualFile(project, filename, GitVirtualFile.Status.IGNORED));
+                }
+            }
         }
-        ChangeMonitor.getInstance().setBuilder(builder);
     }
 
     @Override
@@ -102,6 +143,11 @@ public class GitChangeProvider implements ChangeProvider {
             case UNMODIFIED: {
                 break;
             }
+            case IGNORED: {
+                c = new Change(null, afterRev, FileStatus.IGNORED);
+                break;
+            }
+            case UNVERSIONED:
             default: {
                 c = new Change(null, afterRev, FileStatus.UNKNOWN);
             }

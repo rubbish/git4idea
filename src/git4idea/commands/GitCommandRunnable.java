@@ -14,32 +14,21 @@ package git4idea.commands;
  *
  * This code was originally derived from the MKS & Mercurial IDEA VCS plugins
  */
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.progress.ProgressManager;
+
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.util.EnvironmentUtil;
-
-import java.io.*;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.nio.charset.Charset;
-
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vfs.VirtualFile;
 import git4idea.config.GitVcsSettings;
 import git4idea.GitVcs;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Run a Git command as a Runnable
  */
 @SuppressWarnings({"JavaDoc"})
 public class GitCommandRunnable implements Runnable {
-    private static final int BUF_SIZE = 4096;
     private String cmd = null;
     private Project project = null;
     private GitVcsSettings settings = null;
@@ -47,9 +36,8 @@ public class GitCommandRunnable implements Runnable {
     private String[] args = null;
     private VirtualFile vcsRoot = null;
     private VcsException vcsEx = null;
-    private boolean keepit = false;
     private boolean silent = false;
-    private ByteArrayOutputStream baos = null;
+    private String output = null;
 
     public GitCommandRunnable(@NotNull final Project project, @NotNull GitVcsSettings settings, @NotNull VirtualFile vcsRoot) {
         this.project = project;
@@ -72,76 +60,20 @@ public class GitCommandRunnable implements Runnable {
     public void run() {
         if (cmd == null) throw new IllegalStateException("No command set!");
         vcsEx = null;
-        GitVcs vcs = GitVcs.getInstance(project);
-
-        List<String> cmdLine = new ArrayList<String>();
-        cmdLine.add(settings.GIT_EXECUTABLE);
-        cmdLine.add(cmd);
-        if (opts != null && opts.length > 0)
-            cmdLine.addAll(Arrays.asList(opts));
-        if (args != null && args.length > 0)
-            cmdLine.addAll(Arrays.asList(args));
 
         ProgressManager manager = ProgressManager.getInstance();
         ProgressIndicator indicator = manager.getProgressIndicator();
         indicator.setText("Git " + cmd + "...");
         indicator.setIndeterminate(true);
 
-        String cmdStr = StringUtil.join(cmdLine, " ");
-        vcs.showMessages("git" +  cmdStr.substring(settings.GIT_EXECUTABLE.length()) );
-
-        ProcessBuilder pb = new ProcessBuilder(cmdLine);
-        // copy IDEA configured env into process exec env
-        Map<String, String> pbenv = pb.environment();
-        pbenv.putAll(EnvironmentUtil.getEnviromentProperties());
-
-        File directory = VfsUtil.virtualToIoFile(vcsRoot);
-        pb.directory(directory);
-        pb.redirectErrorStream(true);
-
-        Process proc;
-        BufferedInputStream in = null;
-        int exitValue = -1;
-
-        byte[] buf = new byte[BUF_SIZE];
-        if (keepit)
-            baos = new ByteArrayOutputStream(buf.length);
-
         try {
-            proc = pb.start();
-            Thread.sleep(250);
-            in = new BufferedInputStream(proc.getInputStream());
-
-            int l;
-            while ((l = in.read(buf)) != -1) {
-                if (keepit)
-                    baos.write(buf, 0, l);
-                if (!silent)
-                    vcs.showMessages(new String(buf, 0, l, Charset.defaultCharset()));
+            GitCommand c = new GitCommand(project, settings, vcsRoot);
+            output = c.execute(cmd, opts, args, silent);
+            if(!silent) {
+                GitVcs.getInstance(project).showMessages(output);
             }
-            exitValue = proc.waitFor();
-        } catch (InterruptedException ie) {
-        } catch (Exception e) {
-            vcsEx = new VcsException(e);
-        } finally {
-            try {
-                if (in != null)
-                    in.close();
-            } catch (IOException e) {
-            }
-        }
-
-        if (exitValue != 0 || vcsEx != null) {
-            String msg;
-            if (vcsEx != null)
-                msg = vcsEx.getMessage();
-            else {
-                msg = new String(buf);
-                int nullIdx = msg.indexOf(0);
-                if (nullIdx > 5)
-                    msg = msg.substring(0, nullIdx); // strip out nulls
-                vcsEx = new VcsException(msg);
-            }
+        } catch (VcsException e) {
+            vcsEx = e;
         }
     }
 
@@ -176,14 +108,6 @@ public class GitCommandRunnable implements Runnable {
     }
 
     /**
-     * Set to true if a copy of the git command output should be saved. Use getOutput()
-     * later to retrieve it. (Default is false)
-     */
-    public void saveOutput(boolean keepit) {
-        this.keepit = keepit;
-    }
-
-    /**
      * Set to true if git command output is to NOT be sent the version control console. (Default is false)
      */
     public void setSilent(boolean isSilent) {
@@ -191,15 +115,12 @@ public class GitCommandRunnable implements Runnable {
     }
 
     /**
-     * Retrieve the output (error & stdout are mingled) from the git command. This is only useful after the command has finished running...
+     * Returns the output (stdout & stderr) from the command.
+     *
+     * @return the command output
      */
     public String getOutput() {
-        if (!keepit)
-            return null;
-        try {
-            return baos.toString(Charset.defaultCharset().name());
-        } catch (UnsupportedEncodingException e) { // should never happen...
-            return null;
-        }
+        return output;
     }
+
 }

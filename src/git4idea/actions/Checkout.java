@@ -52,7 +52,10 @@ public class Checkout extends BasicAction {
             String selectedBranch = null;
             int i = 0;
             for (GitBranch b : branches) {
-                branchesList[i++] = b.getName();
+                if(b.isRemote())
+                    branchesList[i++] = b.getName() + " (remote)";
+                else
+                    branchesList[i++] = b.getName();
                 if (selectedBranch == null || b.isActive())
                     selectedBranch = b.getName();
             }
@@ -82,7 +85,6 @@ public class Checkout extends BasicAction {
             cmdr.setArgs(args);
 
             ProgressManager manager = ProgressManager.getInstance();
-            //TODO: make this async so the git command output can be seen in the version control window as it happens...
             manager.runProcessWithProgressSynchronously(cmdr, "Checkout " + args[0], false, project);
 
             VcsException ex = cmdr.getException();

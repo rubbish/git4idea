@@ -23,21 +23,22 @@ import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
+import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager;
 import com.intellij.openapi.vcs.history.VcsFileRevision;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.EnvironmentUtil;
+import git4idea.GitUtil;
+import git4idea.GitVcs;
 import git4idea.actions.GitBranch;
-import git4idea.vfs.GitContentRevision;
+import git4idea.config.GitVcsSettings;
 import git4idea.providers.GitFileAnnotation;
+import git4idea.vfs.GitContentRevision;
 import git4idea.vfs.GitFileRevision;
 import git4idea.vfs.GitRevisionNumber;
 import git4idea.vfs.GitVirtualFile;
-import git4idea.GitUtil;
-import git4idea.GitVcs;
-import git4idea.config.GitVcsSettings;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
@@ -46,7 +47,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -99,11 +99,12 @@ public class GitCommand {
     public static final String MERGETOOL_CMD = "mergetool";
     public static final String STATUS_CMD = "ls-files";
     private static final String DIFF_TREE_CMD = "diff-tree";
+    private static final String UPDATE_INDEX_CMD = "update-index";
 
     private static String fileSep = System.getProperty("os.name").startsWith("Windows") ? "\\" : "/";
     private static String pathSep = System.getProperty("path.separator", ";");
     private final static String line_sep = "\n";
-    
+
     /* Misc Git constants */
     private static final String HEAD = "HEAD";
     private static final Lock gitWriteLock = new ReentrantLock();
@@ -284,17 +285,17 @@ public class GitCommand {
     }
 
     /**
-     * Returns a set of all changed Git files not yet cached into the Git index under this VCS root.
+     * Returns a set of all changed Git filenames not yet cached into the Git index under this VCS root.
      *
      * @return The set of all changed files
      * @throws VcsException If an error occurs
      */
-    public Set<GitVirtualFile> gitUnCachedFiles() throws VcsException {
-        Set<GitVirtualFile> files = new HashSet<GitVirtualFile>();
+    public Set<String> gitUnCachedFiles() throws VcsException {
+        Set<String> files = new HashSet<String>();
         String output;
         List<String> args = new ArrayList<String>();
         args.add("--name-status");
-        args.add("--diff-filter=ADMRUX");
+        args.add("--diff-filter=MRU");
         args.add("--");
         output = execute(DIFF_CMD, args, true);
 
@@ -307,8 +308,7 @@ public class GitCommand {
                 final String s = tokenizer.nextToken();
                 String[] larr = s.split("\t");
                 if (larr.length == 2) {
-                    GitVirtualFile file = new GitVirtualFile(project, getBasePath() + "/" + larr[1], convertStatus(larr[0]));
-                    files.add(file);
+                    files.add(getBasePath() + "/" + larr[1]);
                 }
             }
         }
@@ -317,13 +317,13 @@ public class GitCommand {
     }
 
     /**
-     * Returns a set of all Git-unversioned files under this VCS root.
+     * Returns a set of all Git-unversioned filenames under this VCS root.
      *
      * @return The set of all changed files
      * @throws VcsException If an error occurs
      */
-    public Set<GitVirtualFile> gitOtherFiles() throws VcsException {
-        Set<GitVirtualFile> files = new HashSet<GitVirtualFile>();
+    public Set<String> gitOtherFiles() throws VcsException {
+        Set<String> files = new HashSet<String>();
         String output;
         List<String> args = new ArrayList<String>();
         args.add("--others");
@@ -333,8 +333,32 @@ public class GitCommand {
             StringTokenizer tokenizer = new StringTokenizer(output, line_sep);
             while (tokenizer.hasMoreTokens()) {
                 final String s = tokenizer.nextToken();
-                GitVirtualFile file = new GitVirtualFile(project, getBasePath() + "/" + s.trim(), GitVirtualFile.Status.UNVERSIONED);
-                files.add(file);
+                files.add(getBasePath() + "/" + s.trim());
+            }
+        }
+
+        return files;
+    }
+
+    /**
+     * Returns a set of all Git configured ignored filenames under this VCS root.
+     *
+     * @return The set of all changed files
+     * @throws VcsException If an error occurs
+     */
+    public Set<String> gitIgnoredFiles() throws VcsException {
+        Set<String> files = new HashSet<String>();
+        String output;
+        List<String> args = new ArrayList<String>();
+        args.add("--ignored ");
+        args.add("--exclude-standard");
+        args.add("--");
+        output = execute(STATUS_CMD, args, true);
+        if (output != null && output.length() > 0) {
+            StringTokenizer tokenizer = new StringTokenizer(output, line_sep);
+            while (tokenizer.hasMoreTokens()) {
+                final String s = tokenizer.nextToken();
+                files.add(getBasePath() + "/" + s.trim());
             }
         }
 
@@ -513,7 +537,7 @@ public class GitCommand {
                 BufferedWriter out = new BufferedWriter(new FileWriter(temp));
                 out.write(commitMessage.toString());
                 out.close();
-                options = new String[]{"-F", temp.getAbsolutePath()};
+                options = new String[]{"-i", "-F", temp.getAbsolutePath()};
             } catch (IOException e) {
             }
 
@@ -538,6 +562,7 @@ public class GitCommand {
         } finally {
             gitWriteLock.unlock();
         }
+        ChangeListManager.getInstance(project).scheduleUpdate(true);
     }
 
     /**
@@ -732,16 +757,20 @@ public class GitCommand {
     public void revert(VirtualFile[] files) throws VcsException {
         gitWriteLock.lock();
         try {
-            String[] args = new String[files.length];
-            String[] options = new String[]{HEAD, "--"};
-            int count = 0;
+            StringBuffer result = new StringBuffer();
             for (VirtualFile file : files) {
-                if (file != null)
-                    args[count++] = getRelativeFilePath(file, vcsRoot);
+                if (file != null) {
+                    String[] args = new String[]{getRelativeFilePath(file, vcsRoot)};
+                    if (gitStatus(file) == GitVirtualFile.Status.ADDED) {
+                        String[] options = new String[]{"--force-remove", "--"};
+                        result.append(execute(UPDATE_INDEX_CMD, options, args));
+                    } else {
+                        String[] options = new String[]{HEAD, "--"};
+                        result.append(execute(REVERT_CMD, options, args));
+                    }
+                }
             }
-
-            String result = execute(REVERT_CMD, options, args);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessages(result.toString());
         } finally {
             gitWriteLock.unlock();
         }
@@ -837,18 +866,82 @@ public class GitCommand {
     }
 
     /**
+     * Return true if the specified file is known to Git, otherwise false.
+     *
+     * @param file the file to check status of
+     * @return true if Git owns the file, else false
+     * @throws VcsException If an error occurs
+     */
+    public GitVirtualFile.Status gitStatus(VirtualFile file) throws VcsException {
+        String path = getRelativeFilePath(file, GitUtil.getVcsRoot(project, file));
+        String[] opts = new String[]{"--cached", "--name-status", "--"};
+        String[] args = new String[]{path};
+        String output = execute(DIFF_CMD, opts, args, true);
+        if (output == null || !output.contains(path)) return null;
+        return convertStatus(output.split("\t")[0]);
+    }
+
+    /**
      * Exec the git merge tool
      *
      * @param files The files to merge
      * @throws VcsException If an error occurs
      */
     public void mergetool(String[] files) throws VcsException {
-        String result;
-        if (files == null || files.length == 0)
-            result = execute(MERGETOOL_CMD);
+        String gitcmd;
+        File gitExec = new File(settings.GIT_EXECUTABLE);
+        if (gitExec.exists())  // use absolute path if we can
+            gitcmd = gitExec.getAbsolutePath();
         else
-            result = execute(MERGETOOL_CMD, (String[]) null, files);
-        GitVcs.getInstance(project).showMessages(result);
+            gitcmd = "git";
+
+        Process proc;
+        try {
+            List<String> cmdLine = new LinkedList<String>();
+            cmdLine.add(gitcmd);
+            cmdLine.add(MERGETOOL_CMD);
+            if (files != null && files.length > 0) {
+                for (String file : files) {
+                    if (file != null)
+                        cmdLine.add(file);
+                }
+            }
+
+            File directory = VfsUtil.virtualToIoFile(vcsRoot);
+            ProcessBuilder pb = new ProcessBuilder(cmdLine);
+            // copy IDEA configured env into process exec env
+            Map<String, String> pbenv = pb.environment();
+            pbenv.putAll(EnvironmentUtil.getEnviromentProperties());
+            if (pbenv.get("GIT_DIR") == null)
+                pbenv.put("GIT_DIR", directory.getAbsolutePath() + fileSep + ".git");
+            String PATH = pbenv.get("PATH");    // fix up path...
+            pbenv.put("PATH", gitExec.getParent() + pathSep + PATH);
+            pb.directory(directory);
+            pb.redirectErrorStream(true);
+
+            if (DEBUG) {
+                String cmdStr = StringUtil.join(cmdLine, " ");
+                GitVcs.getInstance(project).showMessages("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
+                        " exec: [" + cmdStr + "]");
+            }
+
+            proc = pb.start();     // we're not waiting for the process, let IDEA continue
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {  // let it fire up, don't care if we get interrupted
+            }
+        } catch (Exception e) {
+            throw new VcsException(e);
+        }
+
+        try {
+            if (proc.exitValue() != 0) {
+                throw new VcsException("Error executing mergetool!");
+            }
+
+        } catch (IllegalThreadStateException ie) {
+            // ignore if we get this since it means it just hasn't terminated yet... probably working!
+        }
     }
 
     /**
@@ -882,7 +975,7 @@ public class GitCommand {
             // copy IDEA configured env into process exec env
             Map<String, String> pbenv = pb.environment();
             pbenv.putAll(EnvironmentUtil.getEnviromentProperties());
-            if(pbenv.get("GIT_DIR") == null)
+            if (pbenv.get("GIT_DIR") == null)
                 pbenv.put("GIT_DIR", directory.getAbsolutePath() + fileSep + ".git");
             String PATH = pbenv.get("PATH");    // fix up path so wish can find git when it needs it...
 
@@ -909,7 +1002,7 @@ public class GitCommand {
         try {
             if (proc.exitValue() != 0)
                 throw new VcsException("Error executing gitk!");
-        }catch(IllegalThreadStateException ie) {
+        } catch (IllegalThreadStateException ie) {
             // ignore if we get this since it means it just hasn't terminated yet... probably working!
         }
     }
@@ -1093,6 +1186,22 @@ public class GitCommand {
         return execute(cmd, options, args);
     }
 
+    public String execute(@NotNull String cmd, String[] options, String[] args, boolean silent) throws VcsException {
+        List<String> cmdArgs = new LinkedList<String>();
+        if (options != null && options.length > 0) {
+            for (String c : options) {
+                if (c != null) cmdArgs.add(c);
+            }
+        }
+        if (args != null && args.length > 0) {
+            for (String c : args) {
+                if (c != null) cmdArgs.add(c);
+            }
+        }
+
+        return execute(cmd, cmdArgs, silent);
+    }
+
     private String execute(@NotNull String cmd, String[] options, String[] args) throws VcsException {
         List<String> cmdLine = new ArrayList<String>();
         if (options != null) {
@@ -1126,7 +1235,7 @@ public class GitCommand {
         return execute(cmd, Arrays.asList(cmdArgs), silent);
     }
 
-    private String execute(@NotNull String cmd, List<String> cmdArgs, boolean silent) throws VcsException {
+    public String execute(@NotNull String cmd, List<String> cmdArgs, boolean silent) throws VcsException {
         int bufsize = BUF_SIZE;
         List<String> cmdLine = new ArrayList<String>();
         cmdLine.add(settings.GIT_EXECUTABLE);
@@ -1145,7 +1254,7 @@ public class GitCommand {
 
         File directory = VfsUtil.virtualToIoFile(vcsRoot);
 
-        String cmdStr=null;
+        String cmdStr = null;
         if (DEBUG) {
             cmdStr = StringUtil.join(cmdLine, " ");
             GitVcs.getInstance(project).showMessages("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
@@ -1163,7 +1272,7 @@ public class GitCommand {
             // copy IDEA configured env into process exec env
             Map<String, String> pbenv = pb.environment();
             pbenv.putAll(EnvironmentUtil.getEnviromentProperties());
-            if(pbenv.get("GIT_DIR") == null)
+            if (pbenv.get("GIT_DIR") == null)
                 pbenv.put("GIT_DIR", directory.getAbsolutePath() + fileSep + ".git");
             pb.directory(directory);
             pb.redirectErrorStream(true);
@@ -1213,53 +1322,6 @@ public class GitCommand {
         }
     }
 
-    public InputStream execAsync() throws VcsException {
-        if (cmd == null) throw new VcsException("No command specified!");
-
-        List<String> cmdLine = new ArrayList<String>();
-        cmdLine.add(settings.GIT_EXECUTABLE);
-        cmdLine.add(cmd);
-        if (opts != null && opts.length > 0)
-            cmdLine.addAll(Arrays.asList(opts));
-
-        if (args != null && args.length > 0)
-            cmdLine.addAll(Arrays.asList(args));
-
-        String cmdString = StringUtil.join(cmdLine, " ");
-        GitVcs.getInstance(project).showMessages(cmdString);
-        File directory = VfsUtil.virtualToIoFile(vcsRoot);
-
-        try {
-            ProcessBuilder pb = new ProcessBuilder(cmdLine);
-            // copy IDEA configured env into process exec env
-            Map<String, String> pbenv = pb.environment();
-            pbenv.putAll(EnvironmentUtil.getEnviromentProperties());
-            pb.directory(directory);
-            pb.redirectErrorStream(true);
-
-            proc = pb.start();
-            return proc.getInputStream();
-
-        }
-        catch (IOException e) {
-            throw new VcsException(e.getMessage());
-        }
-    }
-
-    public boolean isFinished() {
-        if (proc == null) return false;
-        try {
-            proc.exitValue();
-            return true;
-        } catch (IllegalThreadStateException e) {
-            return false;
-        }
-    }
-
-    public int exitCode() {
-        return proc.exitValue();
-    }
-
     /**
      * Returns the base path of the project.
      *
@@ -1277,8 +1339,10 @@ public class GitCommand {
      * @throws com.intellij.openapi.vcs.VcsException
      *          something bad had happened
      */
-    private GitVirtualFile.Status convertStatus(String status) throws VcsException {
+    public GitVirtualFile.Status convertStatus(String status) throws VcsException {
         if (status.equals("M"))
+            return GitVirtualFile.Status.MODIFIED;
+        else if (status.equals("H"))
             return GitVirtualFile.Status.MODIFIED;
         else if (status.equals("C"))
             return GitVirtualFile.Status.COPY;

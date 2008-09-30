@@ -29,11 +29,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Git "add" action
  */
 public class Add extends BasicAction {
+    private static final String ADD_TITLE = "Add file";
+    private static final String ADD_MESSAGE = "Add file(s) to Git?\n{0}";
 
     @Override
     public void perform(@NotNull Project project, GitVcs vcs, @NotNull List<VcsException> exceptions,
@@ -43,7 +49,17 @@ public class Add extends BasicAction {
         if (!ProjectLevelVcsManager.getInstance(project).checkAllFilesAreUnder(GitVcs.getInstance(project), affectedFiles))
             return;
 
-        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, affectedFiles);
+        List<VirtualFile> files = new ArrayList<VirtualFile>();
+        files.addAll(Arrays.asList(affectedFiles));
+        Collection<VirtualFile> filesToAdd;
+        VcsShowConfirmationOption option = vcs.getAddConfirmation();
+        AbstractVcsHelper helper = AbstractVcsHelper.getInstance(project);
+               filesToAdd = helper.selectFilesToProcess(files, ADD_TITLE, null, ADD_TITLE, ADD_MESSAGE, option);
+
+         if (filesToAdd == null || filesToAdd.size() == 0)
+            return;
+
+        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, filesToAdd);
 
         for (VirtualFile root : roots.keySet()) {
             GitCommand command = new GitCommand(project, vcs.getSettings(), root);

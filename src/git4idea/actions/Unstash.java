@@ -12,21 +12,23 @@ package git4idea.actions;
  * Copyright 2008 MQSoftware
  * Authors: Mark Scott
  */
-import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.ProjectLevelVcsManager;
-import com.intellij.openapi.vcs.AbstractVcs;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.ui.Messages;
+
 import com.intellij.openapi.progress.ProgressManager;
-import git4idea.GitVcs;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vcs.AbstractVcs;
+import com.intellij.openapi.vcs.ProjectLevelVcsManager;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vfs.VirtualFile;
 import git4idea.GitUtil;
+import git4idea.GitVcs;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Git un-stash action
@@ -38,13 +40,14 @@ public class Unstash extends BasicAction {
         if (!ProjectLevelVcsManager.getInstance(project).checkAllFilesAreUnder(GitVcs.getInstance(project), affectedFiles))
             return;
 
-        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, affectedFiles);
+        final Set<VirtualFile> roots = GitUtil.getVcsRootsForFiles(project, affectedFiles);
 
-        for (VirtualFile root : roots.keySet()) {
+        for (VirtualFile root : roots) {
             GitCommand command = new GitCommand(project, vcs.getSettings(), root);
             String[] stashList = command.stashList();
             if (stashList == null || stashList.length == 0) continue;
-            int stashIndex = Messages.showChooseDialog("Select stash to restore: ", "UnStash Changes", stashList, stashList[0], Messages.getQuestionIcon());
+            int stashIndex = Messages.showChooseDialog("Select stash to restore: ",
+                    "UnStash Changes for " + root.getPath(), stashList, stashList[0], Messages.getQuestionIcon());
             if (stashIndex < 0)
                 continue;
 

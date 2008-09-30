@@ -66,6 +66,7 @@ import git4idea.envs.GitRollbackEnvironment;
 import git4idea.envs.GitUpdateEnvironment;
 import git4idea.config.GitVcsConfigurable;
 import git4idea.config.GitVcsSettings;
+import git4idea.changes.ChangeMonitor;
 
 /**
  * Git VCS implementation
@@ -231,10 +232,9 @@ public class GitVcs extends AbstractVcs implements Disposable {
         VirtualFileManager.getInstance().addVirtualFileListener(gitFileAdapter, activationDisposable);
         LocalFileSystem.getInstance().registerAuxiliaryFileOperationsHandler(gitFileAdapter);
         RefactoringListenerManager.getInstance(myProject).addListenerProvider(renameListenerProvider);
-//        ChangeMonitor mon = ChangeMonitor.getInstance();
-//        mon.setProject(myProject);
-//        mon.setGitVcsSettings(settings);
-//        mon.start();
+        ChangeMonitor mon = ChangeMonitor.getInstance(myProject);
+        mon.setGitVcsSettings(settings);
+        mon.start();
     }
 
     @Override
@@ -246,7 +246,7 @@ public class GitVcs extends AbstractVcs implements Disposable {
         assert activationDisposable != null;
         Disposer.dispose(activationDisposable);
         activationDisposable = null;
-//        ChangeMonitor.getInstance().stopRunning();
+        ChangeMonitor.getInstance(myProject).stopRunning();
     }
 
     @NotNull

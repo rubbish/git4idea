@@ -30,6 +30,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collection;
 
 import git4idea.vfs.GitFileSystem;
 
@@ -84,8 +88,25 @@ public class GitUtil {
         return result;
     }
 
+     @NotNull
+    public static Map<VirtualFile, List<VirtualFile>> sortFilesByVcsRoot(
+              @NotNull Project project,
+            @NotNull Collection<VirtualFile> virtualFiles) {
+         return sortFilesByVcsRoot(project, new LinkedList<VirtualFile>(virtualFiles));
+     }
+
     @NotNull
     public static Map<VirtualFile, List<VirtualFile>> sortFilesByVcsRoot(Project project, VirtualFile[] affectedFiles) {
         return sortFilesByVcsRoot(project, Arrays.asList(affectedFiles));
+    }
+
+    @NotNull
+    public static Set<VirtualFile> getVcsRootsForFiles(Project project, VirtualFile[] affectedFiles) {
+        Set<VirtualFile> roots = new HashSet<VirtualFile>();
+        for(VirtualFile file: affectedFiles ) {
+            if(file == null) continue;
+            roots.add(getVcsRoot(project,file));
+        }
+        return roots;
     }
 }

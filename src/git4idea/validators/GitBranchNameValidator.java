@@ -16,6 +16,7 @@ package git4idea.validators;
  *
  * This code was originally derived from the MKS & Mercurial IDEA VCS plugins
  */
+
 import com.intellij.openapi.ui.InputValidator;
 
 /**
@@ -24,7 +25,9 @@ import com.intellij.openapi.ui.InputValidator;
 public class GitBranchNameValidator implements InputValidator {
     @Override
     public boolean checkInput(String inputString) {
-        return inputString.matches("^[a-zA-Z/]+$");
+        return !(inputString == null || inputString.length() == 0);
+        //TODO: actually validate branch names...
+        //return inputString.matches("^[a-zA-Z]+$-.");
     }
 
     @Override

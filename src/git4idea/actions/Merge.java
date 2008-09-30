@@ -18,6 +18,7 @@ package git4idea.actions;
  */
 import git4idea.actions.GitBranch;
 import git4idea.GitVcs;
+import git4idea.GitUtil;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandRunnable;
 import com.intellij.openapi.project.Project;
@@ -30,6 +31,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Git "merge" action
@@ -40,7 +42,14 @@ public class Merge extends BasicAction {
                            @NotNull VirtualFile[] affectedFiles) throws VcsException {
         saveAll();
 
-        final VirtualFile[] roots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+        final Set<VirtualFile> roots = GitUtil.getVcsRootsForFiles(project,affectedFiles);
+         if (roots.size() == 0) {
+            VirtualFile[] proots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+            for (VirtualFile root : proots) {
+                if (root != null)
+                    roots.add(root);
+            }
+        }
         List<GitBranch> branches;
 
         for (VirtualFile root : roots) {
@@ -59,7 +68,8 @@ public class Merge extends BasicAction {
             if (selectedBranch == null)
                 return;
 
-            int branchNum = Messages.showChooseDialog("Select branch to merge into this one (" + currBranch + ")", "Merge Branch", branchesList, selectedBranch.getName(), Messages.getQuestionIcon());
+            int branchNum = Messages.showChooseDialog("Select branch to merge into this one (" + currBranch + ")",
+                    "Merge Branch", branchesList, selectedBranch.getName(), Messages.getQuestionIcon());
             if (branchNum < 0)
                 return;
 
@@ -67,17 +77,16 @@ public class Merge extends BasicAction {
             
             GitCommandRunnable cmdr = new GitCommandRunnable(project, vcs.getSettings(), root);
             cmdr.setCommand(GitCommand.MERGE_CMD);
-            cmdr.setArgs(new String[] { selectedBranch.getName() });
+            cmdr.setArgs(new String[] { "--strategy=resolve", selectedBranch.getName() });
 
             ProgressManager manager = ProgressManager.getInstance();
-            //TODO: make this async so the git command output can be seen in the version control window as it happens...
             manager.runProcessWithProgressSynchronously(cmdr, "Merging branch " + selectedBranch.getName(), false, project);
 
             VcsException ex = cmdr.getException();
             if(ex != null)  {
                 Messages.showErrorDialog(project, ex.getMessage(), "Error occurred during 'git merge'");
                 return;
-            }
+            } 
         }
     }
 
