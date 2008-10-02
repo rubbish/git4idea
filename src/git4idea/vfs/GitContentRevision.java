@@ -18,8 +18,6 @@ package git4idea.vfs;
  */
 
 import git4idea.commands.GitCommand;
-import git4idea.vfs.GitRevisionNumber;
-import git4idea.vfs.GitVirtualFile;
 import git4idea.config.GitVcsSettings;
 import git4idea.GitUtil;
 import com.intellij.openapi.project.Project;

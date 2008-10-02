@@ -18,6 +18,7 @@ package git4idea.actions;
  */
 import git4idea.actions.GitBranch;
 import git4idea.GitVcs;
+import git4idea.GitUtil;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandRunnable;
 import git4idea.validators.GitBranchNameValidator;
@@ -31,6 +32,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Git "checkout" action
@@ -41,7 +43,14 @@ public class Checkout extends BasicAction {
                            @NotNull VirtualFile[] affectedFiles) throws VcsException {
         saveAll();
 
-        final VirtualFile[] roots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+        final Set<VirtualFile> roots = GitUtil.getVcsRootsForFiles(project, affectedFiles);
+        if (roots.size() == 0) {
+            VirtualFile[] proots = ProjectLevelVcsManager.getInstance(project).getRootsUnderVcs(vcs);
+            for (VirtualFile root : proots) {
+                if (root != null)
+                    roots.add(root);
+            }
+        }
         List<GitBranch> branches;
 
         for (VirtualFile root : roots) {
@@ -61,7 +70,7 @@ public class Checkout extends BasicAction {
             }
 
             String branchName = Messages.showEditableChooseDialog(
-                    "Select branch to checkout", "Checkout Branch", Messages.getQuestionIcon(),
+                    "Select branch to checkout for VCS root: " + root.getPath(), "Checkout Branch", Messages.getQuestionIcon(),
                     branchesList, selectedBranch, new GitBranchNameValidator());
 
             if (branchName == null)

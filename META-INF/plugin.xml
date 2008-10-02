@@ -80,30 +80,27 @@
 
         <projectService
                 serviceInterface="git4idea.providers.GitAnnotationProvider"
-                serviceImplementation="git4idea.providers.GitAnnotationProvider" icon="/git4idea/icons/annotate.png"/>
+                serviceImplementation="git4idea.providers.GitAnnotationProvider" />
         <projectService
                 serviceInterface="git4idea.providers.GitDiffProvider"
-                serviceImplementation="git4idea.providers.GitDiffProvider" icon="/git4idea/icons/diff.png"/>
+                serviceImplementation="git4idea.providers.GitDiffProvider"/>
         <projectService
                 serviceInterface="git4idea.providers.GitMergeProvider"
-                serviceImplementation="git4idea.providers.GitMergeProvider" icon="/git4idea/icons/applyNotConflicts.png"/>
+                serviceImplementation="git4idea.providers.GitMergeProvider" />
         <projectService
                 serviceInterface="git4idea.envs.GitCheckinEnvironment"
-                serviceImplementation="git4idea.envs.GitCheckinEnvironment" icon="/git4idea/icons/commit.png"/>
+                serviceImplementation="git4idea.envs.GitCheckinEnvironment" />
         <projectService
                 serviceInterface="git4idea.providers.GitChangeProvider"
-                serviceImplementation="git4idea.providers.GitChangeProvider" icon="/git4idea/icons/allRevisions.png"/>
+                serviceImplementation="git4idea.providers.GitChangeProvider" />
         <projectService
                 serviceInterface="git4idea.providers.GitHistoryProvider"
-                serviceImplementation="git4idea.providers.GitHistoryProvider" icon="/git4idea/icons/showHistory.png"/>
+                serviceImplementation="git4idea.providers.GitHistoryProvider" />
         <projectService
                 serviceInterface="git4idea.envs.GitRollbackEnvironment"
-                serviceImplementation="git4idea.envs.GitRollbackEnvironment" icon="/git4idea/icons/rollback.png"/>
+                serviceImplementation="git4idea.envs.GitRollbackEnvironment" />
         <projectService
                 serviceInterface="git4idea.config.GitVcsSettings"
-                serviceImplementation="git4idea.config.GitVcsSettings" icon="/git4idea/icons/cvs.png"/>
-        <fileEditorProvider implementation="git4idea.providers.GitRevisionGraphEditorProvider" icon="/git4idea/icons/browse.png"/>
-
+                serviceImplementation="git4idea.config.GitVcsSettings" />
     </extensions>
-
 </idea-plugin>

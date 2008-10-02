@@ -20,7 +20,7 @@ package git4idea.vfs;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import org.apache.log4j.lf5.util.StreamUtils;
+import com.intellij.openapi.util.io.StreamUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -137,7 +137,7 @@ public class GitVirtualFile extends VirtualFile {
 
     @Override
     public byte[] contentsToByteArray() throws IOException {
-        return StreamUtils.getBytes(getInputStream());
+        return StreamUtil.loadFromStream(getInputStream());
     }
 
     @Override

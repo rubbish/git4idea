@@ -98,14 +98,14 @@ public class GitChangeProvider implements ChangeProvider {
                 }
             }
             // process Git configured ignored files
-            Set<String> ignoredFilenames = mon.getIgnoredFiles(root);
-            if (ignoredFilenames != null && ignoredFilenames.size() > 0) {
-                for (String filename : ignoredFilenames) {
-                    if (filename == null) continue;
-                        builder.processIgnoredFile(
-                                new GitVirtualFile(project, filename, GitVirtualFile.Status.IGNORED));
-                }
-            }
+//            Set<String> ignoredFilenames = mon.getIgnoredFiles(root);
+//            if (ignoredFilenames != null && ignoredFilenames.size() > 0) {
+//                for (String filename : ignoredFilenames) {
+//                    if (filename == null) continue;
+//                        builder.processIgnoredFile(
+//                                new GitVirtualFile(project, filename, GitVirtualFile.Status.IGNORED));
+//                }
+//            }
         }
     }
 

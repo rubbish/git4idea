@@ -31,13 +31,13 @@ import java.util.Set;
  */
 public class ChangeMonitor extends Thread {
     private static Map<Project, ChangeMonitor> instances = new HashMap<Project, ChangeMonitor>();
-    private static int DEF_INTERVAL_SECS = 10;
+    private static int DEF_INTERVAL_SECS = 20;
     private long interval = DEF_INTERVAL_SECS * 1000L;
     private GitVcsSettings settings;
     private Project project;
     private Map<VirtualFile, Set<String>> uncachedFiles = new HashMap<VirtualFile, Set<String>>();
     private Map<VirtualFile, Set<String>> otherFiles = new HashMap<VirtualFile, Set<String>>();
-     private Map<VirtualFile, Set<String>> ignoredFiles = new HashMap<VirtualFile, Set<String>>();
+    //private Map<VirtualFile, Set<String>> ignoredFiles = new HashMap<VirtualFile, Set<String>>();
     private boolean running = false;
 
     public static synchronized ChangeMonitor getInstance(Project proj) {
@@ -105,15 +105,15 @@ public class ChangeMonitor extends Thread {
         return otherFiles.get(root);
     }
 
-    /**
-     * Returns the list of Git ignored files (specified in .gitignore) for the specified VCS root.
-     *
-     * @param root the vcs root to lookup
-     * @return a list of filenames, or null if none
-     */
-    public Set<String> getIgnoredFiles(VirtualFile root) {
-        return ignoredFiles.get(root);
-    }
+//    /**
+//     * Returns the list of Git ignored files (specified in .gitignore) for the specified VCS root.
+//     *
+//     * @param root the vcs root to lookup
+//     * @return a list of filenames, or null if none
+//     */
+//    public Set<String> getIgnoredFiles(VirtualFile root) {
+//        return ignoredFiles.get(root);
+//    }
 
     @SuppressWarnings({"EmptyCatchBlock"})
     public void run() {
@@ -141,7 +141,7 @@ public class ChangeMonitor extends Thread {
                 final GitCommand cmd = new GitCommand(project, settings, root);
                 uncachedFiles.put(root, cmd.gitUnCachedFiles());
                 otherFiles.put(root, cmd.gitOtherFiles());
-                ignoredFiles.put(root, cmd.gitIgnoredFiles());
+                //ignoredFiles.put(root, cmd.gitIgnoredFiles());
             }
             try {
                 Thread.sleep(5000);

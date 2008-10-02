@@ -113,37 +113,11 @@ public class GitCommand {
     private Project project;
     private final GitVcsSettings settings;
     private VirtualFile vcsRoot;
-    private String cmd;
-    private String[] opts;
-    private String[] args;
-    private Process proc;
 
     public GitCommand(@NotNull final Project project, @NotNull GitVcsSettings settings, @NotNull VirtualFile vcsRoot) {
         this.vcsRoot = vcsRoot;
         this.project = project;
         this.settings = settings;
-    }
-
-    public GitCommand(@NotNull final Project project, @NotNull GitVcsSettings settings, @NotNull VirtualFile vcsRoot,
-                      String cmd, String[] opts, String[] args) {
-        this.vcsRoot = vcsRoot;
-        this.project = project;
-        this.settings = settings;
-        this.cmd = cmd;
-        this.opts = opts;
-        this.args = args;
-    }
-
-    public void setCommand(String cmd) {
-        this.cmd = cmd;
-    }
-
-    public void setOptions(String[] opts) {
-        this.opts = opts;
-    }
-
-    public void setArgs(String[] args) {
-        this.args = args;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
