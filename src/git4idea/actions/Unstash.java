@@ -77,18 +77,21 @@ public class Unstash extends BasicAction {
         if (!ProjectLevelVcsManager.getInstance(project).checkAllFilesAreUnder(GitVcs.getInstance(project), vFiles))
             return false;
 
-        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, vFiles);
+        return true;
 
-        try {
-            for (VirtualFile root : roots.keySet()) {
-                GitCommand command = new GitCommand(project, vcs.getSettings(), root);
-                String[] slist = command.stashList();
-                if (slist != null && slist.length > 0) return true;
-            }
-        } catch (VcsException e) {
-            return false;
-        }
-
-        return false;
+        // TODO: operation too expensive...
+//        final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, vFiles);
+//
+//        try {
+//            for (VirtualFile root : roots.keySet()) {
+//                GitCommand command = new GitCommand(project, vcs.getSettings(), root);
+//                String[] slist = command.stashList();
+//                if (slist != null && slist.length > 0) return true;
+//            }
+//        } catch (VcsException e) {
+//            return false;
+//        }
+//
+//        return false;
     }
 }
