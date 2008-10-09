@@ -18,7 +18,6 @@ package git4idea.actions;
  */
 import git4idea.GitVcs;
 import git4idea.GitUtil;
-import git4idea.actions.GitBranch;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandRunnable;
 import com.intellij.openapi.project.Project;
@@ -104,7 +103,7 @@ public class Pull extends BasicAction {
 
             selectedBranch = branches.get(branchNum);
             cmdr.setCommand(GitCommand.MERGE_CMD);
-            cmdr.setArgs( new String[] { "--strategy=resolve", selectedBranch.getName() });
+            cmdr.setArgs( new String[] { "--strategy=recursive", selectedBranch.getName() });
             manager.runProcessWithProgressSynchronously(cmdr, "Merging branch " + selectedBranch.getName(), false, project);
             ex = cmdr.getException();
             if(ex != null)  {
