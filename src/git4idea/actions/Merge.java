@@ -16,7 +16,6 @@ package git4idea.actions;
  *
  * This code was originally derived from the MKS & Mercurial IDEA VCS plugins
  */
-import git4idea.actions.GitBranch;
 import git4idea.GitVcs;
 import git4idea.GitUtil;
 import git4idea.commands.GitCommand;
@@ -77,7 +76,7 @@ public class Merge extends BasicAction {
             
             GitCommandRunnable cmdr = new GitCommandRunnable(project, vcs.getSettings(), root);
             cmdr.setCommand(GitCommand.MERGE_CMD);
-            cmdr.setArgs(new String[] { "--strategy=resolve", selectedBranch.getName() });
+            cmdr.setArgs(new String[] { "--strategy=recursive", selectedBranch.getName() });
 
             ProgressManager manager = ProgressManager.getInstance();
             manager.runProcessWithProgressSynchronously(cmdr, "Merging branch " + selectedBranch.getName(), false, project);
