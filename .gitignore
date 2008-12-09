@@ -1,1 +1,3 @@
-Git4Idea.i*
+*.iml
+*.ipr
+*.iws
