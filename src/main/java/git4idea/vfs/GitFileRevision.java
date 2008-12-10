@@ -59,32 +59,26 @@ public class GitFileRevision implements VcsFileRevision,Comparable<VcsFileRevisi
         this.branch = branch;
     }
 
-    @Override
     public VcsRevisionNumber getRevisionNumber() {
         return revision;
     }
 
-    @Override
     public Date getRevisionDate() {
         return revision.getTimestamp();
     }
 
-    @Override
     public String getAuthor() {
         return author;
     }
 
-    @Override
     public String getCommitMessage() {
         return message;
     }
 
-    @Override
     public String getBranchName() {
         return branch;
     }
 
-    @Override
     public void loadContent() throws VcsException {
         GitCommand command = new GitCommand(project, GitVcsSettings.getInstance(project), GitUtil.getVcsRoot(project, path));
         String c = command.getContents(path.getPath(), revision.getRev());
@@ -95,19 +89,17 @@ public class GitFileRevision implements VcsFileRevision,Comparable<VcsFileRevisi
         }
     }
 
-    @Override
     public byte[] getContent() throws IOException {
         if (content == null) {
             try {
                 loadContent();
             } catch (VcsException e) {
-                throw new IOException(e);
+                throw new IOException(e.getMessage());
             }
         }
         return content;
     }
 
-    @Override
     public int compareTo(VcsFileRevision rev) {
         if(rev instanceof GitFileRevision)
             return revision.compareTo(((GitFileRevision)rev).revision);

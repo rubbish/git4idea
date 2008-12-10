@@ -45,12 +45,10 @@ public class GitVcsSettings implements PersistentStateComponent<GitVcsSettings> 
     public static final String DEFAULT_GIT_EXEC = "git";
     public String GIT_EXECUTABLE = defaultGit();
 
-    @Override
     public GitVcsSettings getState() {
         return this;
     }
 
-    @Override
     public void loadState(GitVcsSettings gitVcsSettings) {
         XmlSerializerUtil.copyBean(gitVcsSettings, this);
     }

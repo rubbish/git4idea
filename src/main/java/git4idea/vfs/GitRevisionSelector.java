@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * Git revision selector class.
  */
 public class GitRevisionSelector implements RevisionSelector {
-    @Override
+
     @Nullable
     public VcsRevisionNumber selectNumber(@NotNull VirtualFile file) {
         //GitVirtualFile gitFile = (GitVirtualFile) file;

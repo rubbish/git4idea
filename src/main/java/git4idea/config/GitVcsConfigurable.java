@@ -39,46 +39,38 @@ public class GitVcsConfigurable implements Configurable {
         this.settings = settings;
     }
 
-    @Override
     public String getDisplayName() {
         return "Git";
     }
 
-    @Override
     @Nullable
     public Icon getIcon() {
         return null;
     }
 
-    @Override
     @Nullable
     public String getHelpTopic() {
         return null;
     }
 
-    @Override
     public JComponent createComponent() {
         panel = new GitVcsPanel(project);
         panel.load(settings);
         return panel.getPanel();
     }
 
-    @Override
     public boolean isModified() {
         return panel.isModified(settings);
     }
 
-    @Override
     public void apply() throws ConfigurationException {
         panel.save(settings);
     }
 
-    @Override
     public void reset() {
         panel.load(settings);
     }
 
-    @Override
     public void disposeUIResources() {
     }
 }

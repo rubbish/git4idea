@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vcs.AbstractVcsHelper;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vcs.versionBrowser.CommittedChangeList;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.history.VcsFileRevision;
 import com.intellij.vcsUtil.VcsRunnable;
@@ -34,6 +35,7 @@ import git4idea.GitVcs;
 import git4idea.commands.GitCommand;
 
 import java.util.Collection;
+import java.util.Arrays;
 
 /**
  * IDEA action that shows all files changed in the given revision.
@@ -65,7 +67,7 @@ public class ShowAllSubmittedFiles extends AnAction {
 
     public static void showSubmittedFiles(final Project project, final GitFileRevision gitRevision) {
 
-        final Ref<GitCommitChangeList> cl = new Ref<GitCommitChangeList>();
+        final Ref<CommittedChangeList> cl = new Ref<CommittedChangeList>();
 
         final GitRevisionNumber revisionNumber = (GitRevisionNumber) gitRevision.getRevisionNumber();
         String title = getTitle(revisionNumber.getShortRev());
@@ -85,7 +87,7 @@ public class ShowAllSubmittedFiles extends AnAction {
                 }
             }, GitBundle.message("show.all.files.from.change.list.searching.for.changed.files.progress.title"), true, project);
             if (result) {
-                AbstractVcsHelper.getInstance(project).showChangesBrowser(cl.get(), title);
+                AbstractVcsHelper.getInstance(project).showChangesBrowser(Arrays.asList(cl.get()), title);
             }
         }
         catch (VcsException ex) {

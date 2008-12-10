@@ -55,6 +55,10 @@ public class GitCommitChangeList implements CommittedChangeList {
         return vcs;
     }
 
+    public Collection<Change> getChangesWithMovedTrees() {
+        return changes;
+    }
+
     public Collection<Change> getChanges() {
         return changes;
     }

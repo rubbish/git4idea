@@ -22,12 +22,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.changes.Change;
-import com.intellij.openapi.vcs.changes.ChangeProvider;
-import com.intellij.openapi.vcs.changes.ChangelistBuilder;
-import com.intellij.openapi.vcs.changes.ContentRevision;
-import com.intellij.openapi.vcs.changes.CurrentContentRevision;
-import com.intellij.openapi.vcs.changes.VcsDirtyScope;
+import com.intellij.openapi.vcs.changes.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.vcsUtil.VcsUtil;
 import git4idea.changes.ChangeMonitor;
@@ -41,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
+import java.util.List;
 
 /**
  * Git repository change provide
@@ -54,8 +50,7 @@ public class GitChangeProvider implements ChangeProvider {
         this.settings = settings;
     }
 
-    @Override
-    public void getChanges(VcsDirtyScope dirtyScope, ChangelistBuilder builder, ProgressIndicator progress) throws VcsException {
+    public void getChanges(VcsDirtyScope dirtyScope, ChangelistBuilder builder, ProgressIndicator progress, ChangeListManagerGate changeListManagerGate) throws VcsException {
         Collection<VirtualFile> roots = dirtyScope.getAffectedContentRoots();
         ChangeMonitor mon = ChangeMonitor.getInstance(project);
         FileTypeManager ftm = FileTypeManager.getInstance();
@@ -109,9 +104,13 @@ public class GitChangeProvider implements ChangeProvider {
         }
     }
 
-    @Override
+
     public boolean isModifiedDocumentTrackingRequired() {
         return false;
+    }
+
+    public void doCleanup(List<VirtualFile> virtualFiles) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private Change getChange(GitVirtualFile file) {

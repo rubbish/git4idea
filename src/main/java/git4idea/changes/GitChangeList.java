@@ -75,6 +75,10 @@ public class GitChangeList extends LocalChangeList {
         isreadonly = isReadOnly;
     }
 
+    public LocalChangeList copy() {
+        return this;
+    }
+
     public Collection<Change> getChanges() {
         return changes;
     }

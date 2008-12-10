@@ -244,7 +244,7 @@ public class GitVirtualFileAdapter extends VirtualFileAdapter implements LocalFi
 
     public boolean rename(VirtualFile file, String newName) throws IOException {
         if (newName == null) return false;
-        if (!VcsUtil.isPathUnderProject(project, file)) return false;
+        if (!VcsUtil.isFileUnderVcs(project, file.getPath())) return false;
 
         VirtualFile vcsRoot = VcsUtil.getVcsRootFor(project, file);
         GitVcs vcs = (GitVcs) VcsUtil.getVcsFor(project, file);
@@ -256,7 +256,7 @@ public class GitVirtualFileAdapter extends VirtualFileAdapter implements LocalFi
             command.move(file, newFile);
             return true;
         } catch (VcsException ve) {
-            throw new IOException("Error renaming file!\n" + ve.getMessage(), ve);
+            throw new IOException("Error renaming file!\n" + ve.getMessage());
         }
     }
 

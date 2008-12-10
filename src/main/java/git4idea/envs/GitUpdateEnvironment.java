@@ -15,11 +15,13 @@ package git4idea.envs;
 import com.intellij.openapi.vcs.update.UpdateEnvironment;
 import com.intellij.openapi.vcs.update.UpdatedFiles;
 import com.intellij.openapi.vcs.update.UpdateSession;
+import com.intellij.openapi.vcs.update.SequentialUpdatesContext;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Ref;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,20 +44,26 @@ public class GitUpdateEnvironment implements UpdateEnvironment {
         this.config = config;
     }
 
-    @Override
     public void fillGroups(UpdatedFiles updatedFiles) {
         //unused
     }
 
-    @Override
+    @NotNull
+    public UpdateSession updateDirectories(@NotNull FilePath[] filePaths, UpdatedFiles updatedFiles, ProgressIndicator progressIndicator, @NotNull Ref<SequentialUpdatesContext> sequentialUpdatesContextRef) throws ProcessCanceledException {
+        return new GitUpdateSession(null);
+    }
+
     @NotNull
     public UpdateSession updateDirectories(@NotNull FilePath[] contentRoots, UpdatedFiles updatedFiles, ProgressIndicator progressIndicator) throws ProcessCanceledException {
           return new GitUpdateSession(null);
     }
 
-    @Override
     @Nullable
     public Configurable createConfigurable(Collection<FilePath> files) {
         return null;
+    }
+
+    public boolean validateOptions(Collection<FilePath> filePaths) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

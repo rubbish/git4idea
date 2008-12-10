@@ -34,6 +34,9 @@ public class GitChangeListListener implements ChangeListListener {
     public void changeListAdded(ChangeList list) {
     }
 
+    public void changesRemoved(Collection<Change> changes, ChangeList changeList) {
+    }
+
     public void changeListRemoved(ChangeList list) {
     }
 
@@ -49,7 +52,7 @@ public class GitChangeListListener implements ChangeListListener {
     public void changesMoved(Collection<Change> changes, ChangeList fromList, ChangeList toList) {
     }
 
-    public void defaultListChanged(ChangeList newDefaultList) {
+    public void defaultListChanged(ChangeList changeList, ChangeList changeList1) {
     }
 
     public void unchangedFileStatusChanged() {

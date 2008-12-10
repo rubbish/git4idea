@@ -59,29 +59,25 @@ public class GitHistoryProvider implements VcsHistoryProvider {
         this.settings = settings;
     }
 
-    @Override
-    public ColumnInfo[] getRevisionColumns() {
+
+    public ColumnInfo[] getRevisionColumns(VcsHistorySession vcsHistorySession) {
         return new ColumnInfo[0];
     }
 
-    @Override
-     public AnAction[] getAdditionalActions(FileHistoryPanel panel) {
+    public AnAction[] getAdditionalActions(FileHistoryPanel panel) {
             return new AnAction[]{new ShowAllSubmittedFiles()};
      }
 
-    @Override
     public boolean isDateOmittable() {
         return false;
     }
 
-    @Override
     @Nullable
     public String getHelpId() {
         return null;
     }
 
     @SuppressWarnings({"unchecked"})
-    @Override
     @Nullable
     public VcsHistorySession createSessionFor(final FilePath filePath) throws VcsException {
         final List<VcsFileRevision> revisions = new ArrayList<VcsFileRevision>(25);
@@ -122,9 +118,12 @@ public class GitHistoryProvider implements VcsHistoryProvider {
         };
     }
 
-    @Override
     @Nullable
     public HistoryAsTreeProvider getTreeHistoryProvider() {
         return new GitHistoryTreeProvider();
+    }
+
+    public boolean supportsHistoryForDirectories() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
