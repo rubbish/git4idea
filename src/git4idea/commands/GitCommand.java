@@ -1241,6 +1241,8 @@ public class GitCommand {
             GitVcs.getInstance(project).showMessages("git" + cmdStr.substring(settings.GIT_EXECUTABLE.length()));
         }
 
+        Process proc = null;
+        BufferedInputStream in = null;
         try {
             ProcessBuilder pb = new ProcessBuilder(cmdLine);
             // copy IDEA configured env into process exec env
@@ -1250,10 +1252,10 @@ public class GitCommand {
                 pbenv.put("GIT_DIR", directory.getAbsolutePath() + fileSep + ".git");
             pb.directory(directory);
             pb.redirectErrorStream(true);
-            Process proc = pb.start();
+            proc = pb.start();
 
             // Get the output from the process.
-            BufferedInputStream in = new BufferedInputStream(proc.getInputStream());
+            in = new BufferedInputStream(proc.getInputStream());
 
             byte[] workBuf = new byte[bufsize];
             byte[] retBuf = new byte[bufsize];
@@ -1277,7 +1279,6 @@ public class GitCommand {
             } catch (InterruptedException ie) {
                 return EMPTY_STRING;
             }
-            in.close();
 
             if (wpos == 0) return EMPTY_STRING;
             String output = new String(retBuf, 0, wpos);
@@ -1293,6 +1294,11 @@ public class GitCommand {
         }
         catch (IOException e) {
             throw new VcsException(e.getMessage());
+        } finally {
+            try {
+                if(in != null) in.close();
+            } catch (IOException e) {}
+            if(proc != null) proc.destroy();
         }
     }
 
