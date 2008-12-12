@@ -5,11 +5,10 @@
         easily from inside IDEA. A Git toolbar, full merging and refactoring support are also included. Git4Idea requires 
         an external Git command line tool to function.
     </description>
-    <change-notes>Version 1.7 fixes a few minor issues and adds support for the IDEA 3-way merge tool.
-    </change-notes>
-    <version>1.7</version>
+    <change-notes>${project.version}</change-notes>
+    <version>${project.version}</version>
     <vendor url="http://github.com/markscott/git4idea/tree/master" email="mscott@mqsoftware.com">MQSoftware</vendor>
-    <idea-version since-build="5000" until-build="7999"/>
+    <idea-version since-build="5000" until-build="9164"/>
     <application-components>
         <component>
             <implementation-class>git4idea.vfs.GitFileSystem</implementation-class>
