@@ -249,7 +249,7 @@ public class GitCommand {
                 final String s = tokenizer.nextToken();
                 String[] larr = s.split("\t");
                 if (larr.length == 2) {
-                    GitVirtualFile file = new GitVirtualFile(project, getBasePath() + "/" + larr[1], convertStatus(larr[0]));
+                    GitVirtualFile file = new GitVirtualFile(project, getBasePath() + "/" + larr[1], GitVirtualFile.Status.fromString(larr[0]));
                     files.add(file);
                 }
             }
@@ -442,7 +442,7 @@ public class GitCommand {
                 final String s = tokenizer.nextToken();
                 String[] larr = s.split("\t");
                 if (larr.length == 2) {
-                    GitVirtualFile file = new GitVirtualFile(project, getBasePath() + File.separator + larr[1], convertStatus(larr[0]));
+                    GitVirtualFile file = new GitVirtualFile(project, getBasePath() + File.separator + larr[1], GitVirtualFile.Status.fromString(larr[0]));
                     files.add(file);
                 }
             }
@@ -852,7 +852,7 @@ public class GitCommand {
         String[] args = new String[]{path};
         String output = execute(DIFF_CMD, opts, args, true);
         if (output == null || !output.contains(path)) return null;
-        return convertStatus(output.split("\t")[0]);
+        return GitVirtualFile.Status.fromString(output.split("\t")[0]);
     }
 
     /**
@@ -1076,7 +1076,7 @@ public class GitCommand {
             assert tokens.length > 5;
             final String blogIdBefore = tokens[2];
             final String blobIdAfter = tokens[3];
-            final GitVirtualFile.Status status = convertStatus(tokens[4].substring(0, 1));
+            final GitVirtualFile.Status status = GitVirtualFile.Status.fromString(tokens[4].substring(0, 1));
             final String pathArg1 = vcsRoot.getPath() + "/" + tokens[5];
             final String pathArg2 = tokens.length > 6 ? (vcsRoot.getPath() + "/" + tokens[6]) : null;
 
@@ -1311,32 +1311,5 @@ public class GitCommand {
         return vcsRoot.getPath();
     }
 
-    /**
-     * Helper method to convert String status' from the git output to a GitFile status
-     *
-     * @param status The status from git as a String.
-     * @return The git file status.
-     * @throws com.intellij.openapi.vcs.VcsException
-     *          something bad had happened
-     */
-    public GitVirtualFile.Status convertStatus(String status) throws VcsException {
-        if (status.equals("M"))
-            return GitVirtualFile.Status.MODIFIED;
-        else if (status.equals("H"))
-            return GitVirtualFile.Status.MODIFIED;
-        else if (status.equals("C"))
-            return GitVirtualFile.Status.COPY;
-        else if (status.equals("R"))
-            return GitVirtualFile.Status.RENAME;
-        else if (status.equals("A"))
-            return GitVirtualFile.Status.ADDED;
-        else if (status.equals("D"))
-            return GitVirtualFile.Status.DELETED;
-        else if (status.equals("U"))
-            return GitVirtualFile.Status.UNMERGED;
-        else if (status.equals("X"))
-            return GitVirtualFile.Status.UNVERSIONED;
-        else
-            return GitVirtualFile.Status.UNMODIFIED;
-    }
+
 }

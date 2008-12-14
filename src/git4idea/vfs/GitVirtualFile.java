@@ -18,20 +18,13 @@ package git4idea.vfs;
  */
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.StreamUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.intellij.openapi.util.io.StreamUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import git4idea.vfs.GitFileSystem;
+import java.io.*;
 
 /**
  * Git implementation of VCS virtual file
@@ -205,6 +198,33 @@ public class GitVirtualFile extends VirtualFile {
         UNMERGED,
         UNMODIFIED,
         UNVERSIONED,
-        IGNORED
+        IGNORED;
+
+        /**
+         * Helper method to convert String status' from the git output to a GitFile status
+         *
+         * @param status The status from git as a String.
+         * @return The git file status.
+         * @throws com.intellij.openapi.vcs.VcsException
+         *          something bad had happened
+         */
+        public static Status fromString(String status) {
+            if ("A".equals(status)) {
+                return ADDED;
+            } else if ("M".equals(status) || "H".equals(status)) {
+                return MODIFIED;
+            } else if ("C".equals(status)) {
+                return COPY;
+            } else if ("R".equals(status)) {
+                return RENAME;
+            } else if ("D".equals(status)) {
+                return DELETED;
+            } else if ("U".equals(status)) {
+                return UNMERGED;
+            } else if ("X".equals(status)) {
+                return UNVERSIONED;
+            }
+            return UNMODIFIED;
+        }
     }
 }
