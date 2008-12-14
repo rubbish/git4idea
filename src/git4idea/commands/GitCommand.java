@@ -139,37 +139,7 @@ public class GitCommand {
      * @throws VcsException If an error occurs
      */
     public List<GitBranch> branchList(boolean remoteOnly) throws VcsException {
-        ArrayList<String> args = new ArrayList<String>();
-        if (remoteOnly)
-            args.add("-r");
-        String result = execute("branch", args, true);
-        List<GitBranch> branches = new ArrayList<GitBranch>();
-
-        BufferedReader in = new BufferedReader(new StringReader(result));
-        String line;
-        try {
-            while ((line = in.readLine()) != null) {
-                String branchName = line.trim();
-
-                boolean active = false;
-                if (branchName.startsWith("* ")) {
-                    branchName = branchName.substring(2);
-                    active = true;
-                }
-
-                boolean remote = branchName.contains("/");
-                GitBranch branch = new GitBranch(
-                        project,
-                        branchName,
-                        active,
-                        remote);
-                branches.add(branch);
-            }
-        }
-        catch (IOException e) {
-            throw new VcsException(e);
-        }
-        return branches;
+        return new ListBranchesCommand(executor, versionControlSystem, VfsUtil.virtualToIoFile(vcsRoot), remoteOnly).execute();
     }
 
     /**

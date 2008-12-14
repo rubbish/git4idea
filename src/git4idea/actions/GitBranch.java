@@ -23,21 +23,14 @@ import org.jetbrains.annotations.NotNull;
  * This data class represents a Git branch
  */
 public class GitBranch {
-    private Project project;
     private String name;
     private boolean remote;
     private boolean active;
 
-    public GitBranch(@NotNull Project project, @NotNull String name, boolean active, boolean remote) {
-        this.project = project;
+    public GitBranch(@NotNull String name, boolean active, boolean remote) {
         this.name = name;
         this.remote = remote;
         this.active = active;
-    }
-
-    @NotNull
-    public Project getProject() {
-        return project;
     }
 
     @NotNull

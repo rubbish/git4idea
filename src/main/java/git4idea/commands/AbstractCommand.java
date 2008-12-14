@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class AbstractCommand<T> {
+public abstract class AbstractCommand<T> implements Command<T> {
     private CommandExecutor executor;
     private GitVcs versionControlSystem;
     private File workingDirectory;
