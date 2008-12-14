@@ -38,7 +38,7 @@ public class CommandExecutor {
         } catch (InterruptedException e) {
             throw new VcsException(builder.toString(), e);
         } catch (IOException e) {
-            throw new VcsException(e);
+            throw new VcsException(e.getMessage(), e);
         } finally {
             if (input != null) {
                 try {
