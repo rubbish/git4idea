@@ -97,11 +97,14 @@ public class GitCommand {
     private Project project;
     private final GitVcsSettings settings;
     private VirtualFile vcsRoot;
+    private GitVcs versionControlSystem;
+    private CommandExecutor executor = new CommandExecutor();
 
     public GitCommand(@NotNull final Project project, @NotNull GitVcsSettings settings, @NotNull VirtualFile vcsRoot) {
         this.vcsRoot = vcsRoot;
         this.project = project;
         this.settings = settings;
+        this.versionControlSystem = GitVcs.getInstance(project);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,16 +179,7 @@ public class GitCommand {
      * @throws VcsException If an error occurs
      */
     public String currentBranch() throws VcsException {
-        String output = execute(BRANCH_CMD, true);
-        StringTokenizer lines = new StringTokenizer(output, line_sep);
-        while (lines.hasMoreTokens()) {
-            String line = lines.nextToken();
-            if (line != null && line.startsWith("*")) {
-                return line.substring(2);
-            }
-        }
-
-        return "master";
+        return new CurrentBranchCommand(executor, versionControlSystem, VfsUtil.virtualToIoFile(vcsRoot)).execute();
     }
 
     /**
@@ -382,7 +376,7 @@ public class GitCommand {
         commands.addAll(Arrays.asList(args));
         commands.add(getRelativeFilePath(filePath.getPath(), vcsRoot));
 
-        String result = new CommandExecutor().execute(VfsUtil.virtualToIoFile(vcsRoot), commands);
+        String result = executor.execute(VfsUtil.virtualToIoFile(vcsRoot), commands);
 
         List<VcsFileRevision> revisions = new ArrayList<VcsFileRevision>();
 

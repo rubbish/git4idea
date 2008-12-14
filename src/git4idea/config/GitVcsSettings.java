@@ -32,10 +32,10 @@ import java.io.File;
 @State(
         name = "Git.Settings",
         storages = {
-        @Storage(
-                id = "ws",
-                file = "$WORKSPACE_FILE$"
-        )}
+                @Storage(
+                        id = "ws",
+                        file = "$WORKSPACE_FILE$"
+                )}
 )
 public class GitVcsSettings implements PersistentStateComponent<GitVcsSettings> {
     public static final String DEFAULT_CYGWIN_GIT_EXEC = "C:\\cygwin\\bin\\git.exe";
@@ -43,7 +43,11 @@ public class GitVcsSettings implements PersistentStateComponent<GitVcsSettings> 
     public static final String DEFAULT_LOCAL_GIT_EXEC = "/usr/local/bin/git";
     public static final String DEFAULT_UNIX_GIT_EXEC = "/usr/bin/git";
     public static final String DEFAULT_GIT_EXEC = "git";
-    public String GIT_EXECUTABLE = defaultGit();
+    public String GIT_EXECUTABLE;
+
+    public GitVcsSettings() {
+        GIT_EXECUTABLE = locationOfGit();
+    }
 
     @Override
     public GitVcsSettings getState() {
@@ -59,7 +63,11 @@ public class GitVcsSettings implements PersistentStateComponent<GitVcsSettings> 
         return ServiceManager.getService(project, GitVcsSettings.class);
     }
 
-    private String defaultGit() {
+    public String locationOfGit() {
+        if (GIT_EXECUTABLE != null) {
+            return GIT_EXECUTABLE;
+        }
+
         String os = System.getProperty("os.name");
         if (os.startsWith("Windows")) {
             File exe = new File(DEFAULT_CYGWIN_GIT_EXEC);   // Look for Cygwin Git first
@@ -69,11 +77,11 @@ public class GitVcsSettings implements PersistentStateComponent<GitVcsSettings> 
         } else {
             File exe = new File(DEFAULT_UNIX_GIT_EXEC);
             if (exe.exists()) return exe.getAbsolutePath();
-            exe = new File(DEFAULT_UNIX_GIT_EXEC.replace("usr","opt"));
+            exe = new File(DEFAULT_UNIX_GIT_EXEC.replace("usr", "opt"));
             if (exe.exists()) return exe.getAbsolutePath();
             exe = new File(DEFAULT_LOCAL_GIT_EXEC);
             if (exe.exists()) return exe.getAbsolutePath();
-            exe = new File(DEFAULT_LOCAL_GIT_EXEC.replace("usr","opt"));
+            exe = new File(DEFAULT_LOCAL_GIT_EXEC.replace("usr", "opt"));
             if (exe.exists()) return exe.getAbsolutePath();
         }
         return DEFAULT_GIT_EXEC;     // otherwise, hope it's in $PATH
