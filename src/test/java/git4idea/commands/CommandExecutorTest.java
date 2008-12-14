@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 
 public class CommandExecutorTest extends TestCase {
@@ -71,6 +72,21 @@ public class CommandExecutorTest extends TestCase {
         verify(process).getInputStream();
     }
 
+    public void test_execute_ReturnCodeZero_ListArgs() throws InterruptedException, VcsException {
+        String expectedOutput = "Output";
+
+        when(process.waitFor()).thenReturn(0);
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream(expectedOutput.getBytes()));
+
+        String output = executor.execute(new File("."), Arrays.asList("ls", "-la"));
+
+        assertNotNull(output);
+        assertEquals(expectedOutput, output);
+
+        verify(process).waitFor();
+        verify(process).getInputStream();
+    }
+
     public void test_execute_ReturnCodeNotZero() throws InterruptedException {
         String expectedOutput = "Output";
 
@@ -93,7 +109,7 @@ public class CommandExecutorTest extends TestCase {
         private Process process;
 
         @Override
-        protected Process createProcess(File workingDirectory, String command) {
+        protected Process createProcess(File workingDirectory, String[] commands) {
             return process;
         }
     }

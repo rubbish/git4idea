@@ -41,26 +41,10 @@ import git4idea.vfs.GitRevisionNumber;
 import git4idea.vfs.GitVirtualFile;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -390,7 +374,15 @@ public class GitCommand {
                         getRelativeFilePath(filePath.getPath(), vcsRoot)
                 };
 
-        String result = execute(LOG_CMD, options, args);
+
+        List<String> commands = new ArrayList<String>();
+        commands.add(settings.GIT_EXECUTABLE);
+        commands.add("log");
+        commands.addAll(Arrays.asList(options));
+        commands.addAll(Arrays.asList(args));
+        commands.add(getRelativeFilePath(filePath.getPath(), vcsRoot));
+
+        String result = new CommandExecutor().execute(VfsUtil.virtualToIoFile(vcsRoot), commands);
 
         List<VcsFileRevision> revisions = new ArrayList<VcsFileRevision>();
 
