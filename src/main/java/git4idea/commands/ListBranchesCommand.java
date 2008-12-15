@@ -7,6 +7,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.intellij.openapi.vcs.VcsException;
+
 
 public class ListBranchesCommand extends AbstractCommand<List<GitBranch>> {
     private boolean remoteBranches;
@@ -23,7 +25,7 @@ public class ListBranchesCommand extends AbstractCommand<List<GitBranch>> {
         }
     }
 
-    protected List<GitBranch> handleCommandOutput(String output) {
+    protected List<GitBranch> handleCommandOutput(String output) throws VcsException {
         ArrayList<GitBranch> branches = new ArrayList<GitBranch>();
         for (String line : output.split("[\\n|\\r]")) {
             if (line.trim().startsWith("*")) {

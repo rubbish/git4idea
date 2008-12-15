@@ -27,12 +27,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.vcs.AbstractVcs;
-import com.intellij.openapi.vcs.FilePath;
-import com.intellij.openapi.vcs.ProjectLevelVcsManager;
-import com.intellij.openapi.vcs.VcsConfiguration;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.VcsShowConfirmationOption;
+import com.intellij.openapi.vcs.*;
 import com.intellij.openapi.vcs.changes.ChangeProvider;
 import com.intellij.openapi.vcs.checkin.CheckinEnvironment;
 import com.intellij.openapi.vcs.diff.DiffProvider;
@@ -46,27 +41,22 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.refactoring.listeners.RefactoringElementListenerProvider;
 import com.intellij.refactoring.listeners.RefactoringListenerManager;
+import git4idea.changes.ChangeMonitor;
+import git4idea.config.GitVcsConfigurable;
+import git4idea.config.GitVcsSettings;
+import git4idea.envs.GitCheckinEnvironment;
+import git4idea.envs.GitRollbackEnvironment;
+import git4idea.envs.GitUpdateEnvironment;
+import git4idea.providers.*;
+import git4idea.vfs.GitRevisionNumber;
+import git4idea.vfs.GitRevisionSelector;
+import git4idea.vfs.GitVirtualFile;
+import git4idea.vfs.GitVirtualFileAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.Iterator;
-
-import git4idea.providers.GitAnnotationProvider;
-import git4idea.providers.GitChangeProvider;
-import git4idea.providers.GitDiffProvider;
-import git4idea.providers.GitHistoryProvider;
-import git4idea.providers.GitRefactoringListenerProvider;
-import git4idea.vfs.GitRevisionNumber;
-import git4idea.vfs.GitRevisionSelector;
-import git4idea.vfs.GitVirtualFile;
-import git4idea.vfs.GitVirtualFileAdapter;
-import git4idea.envs.GitCheckinEnvironment;
-import git4idea.envs.GitRollbackEnvironment;
-import git4idea.envs.GitUpdateEnvironment;
-import git4idea.config.GitVcsConfigurable;
-import git4idea.config.GitVcsSettings;
-import git4idea.changes.ChangeMonitor;
 
 /**
  * Git VCS implementation
@@ -286,9 +276,7 @@ public class GitVcs extends AbstractVcs implements Disposable {
         }
     }
 
-    public void showMessages(@NotNull String message) {
-        if (message.length() == 0)
-            return;
+    public void showMessage(@NotNull String message) {
         showMessage(message, HighlighterColors.TEXT);
     }
 
@@ -297,7 +285,9 @@ public class GitVcs extends AbstractVcs implements Disposable {
         return settings;
     }
 
-    private void showMessage(@NotNull String message, final TextAttributesKey text) {
+    public void showMessage(@NotNull String message, final TextAttributesKey text) {
+        if (message.length() == 0)
+            return;
         vcsManager.addMessageToConsoleWindow(message, editorColorsScheme.getAttributes(text));
     }
 

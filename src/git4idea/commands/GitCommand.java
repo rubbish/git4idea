@@ -42,8 +42,6 @@ import git4idea.vfs.GitVirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -433,7 +431,7 @@ public class GitCommand {
             }
 
             String result = execute(ADD_CMD, (String[]) null, args);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -480,7 +478,7 @@ public class GitCommand {
 
             add(files); // add current snapshot to index first..
             String result = execute(COMMIT_CMD, options, args);  // now commit the files
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
 
             VcsDirtyScopeManager mgr = VcsDirtyScopeManager.getInstance(project);
             for (VirtualFile file : files) {
@@ -513,7 +511,7 @@ public class GitCommand {
             }
 
             String result = execute(DELETE_CMD, opts, args);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -537,7 +535,7 @@ public class GitCommand {
             args.add(selectedBranch);
 
             String result = execute(CHECKOUT_CMD, args);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -555,7 +553,7 @@ public class GitCommand {
         try {
             String[] args = new String[]{src, target};
             String result = execute(CLONE_CMD, (String) null, args);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -570,7 +568,7 @@ public class GitCommand {
         gitWriteLock.lock();
         try {
             String result = execute(MERGE_CMD);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -589,7 +587,7 @@ public class GitCommand {
             String[] files = new String[]{getRelativeFilePath(oldFile.getPath(), vcsRoot),
                     getRelativeFilePath(newFile.getPath(), vcsRoot)};
             String result = execute(MOVE_CMD, files, false);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -604,7 +602,7 @@ public class GitCommand {
         gitWriteLock.lock();
         try {
             String result = execute(GC_CMD);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -620,7 +618,7 @@ public class GitCommand {
         gitWriteLock.lock();
         try {
             String result = execute(MERGE_CMD, branch.getName());
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -635,7 +633,7 @@ public class GitCommand {
         gitWriteLock.lock();
         try {
             String result = execute(REBASE_CMD);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -658,9 +656,9 @@ public class GitCommand {
                 cmd = FETCH_CMD;
 
             String result = execute(cmd, repoURL);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
             result = execute(cmd, "--tags", repoURL);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -673,9 +671,9 @@ public class GitCommand {
      */
     public void push() throws VcsException {
         String result = execute(PUSH_CMD);
-        GitVcs.getInstance(project).showMessages(result);
+        GitVcs.getInstance(project).showMessage(result);
         result = execute(PUSH_CMD, "--tags");
-        GitVcs.getInstance(project).showMessages(result);
+        GitVcs.getInstance(project).showMessage(result);
     }
 
     /**
@@ -700,7 +698,7 @@ public class GitCommand {
                     }
                 }
             }
-            GitVcs.getInstance(project).showMessages(result.toString());
+            GitVcs.getInstance(project).showMessage(result.toString());
         } finally {
             gitWriteLock.unlock();
         }
@@ -726,7 +724,7 @@ public class GitCommand {
         gitWriteLock.lock();
         try {
             String result = execute(TAG_CMD, tagName);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -742,7 +740,7 @@ public class GitCommand {
         gitWriteLock.lock();
         try {
             String result = execute(STASH_CMD, stashName);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -758,7 +756,7 @@ public class GitCommand {
         gitWriteLock.lock();
         try {
             String result = execute(STASH_CMD, "apply", stashName);
-            GitVcs.getInstance(project).showMessages(result);
+            GitVcs.getInstance(project).showMessage(result);
         } finally {
             gitWriteLock.unlock();
         }
@@ -851,7 +849,7 @@ public class GitCommand {
 
             if (DEBUG) {
                 String cmdStr = StringUtil.join(cmdLine, " ");
-                GitVcs.getInstance(project).showMessages("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
+                GitVcs.getInstance(project).showMessage("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
                         " exec: [" + cmdStr + "]");
             }
 
@@ -916,7 +914,7 @@ public class GitCommand {
             if (DEBUG) {
                 String[] cmdLine = new String[]{wishcmd, gitkcmd, filename};
                 String cmdStr = StringUtil.join(cmdLine, " ");
-                GitVcs.getInstance(project).showMessages("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
+                GitVcs.getInstance(project).showMessage("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
                         " exec: [" + cmdStr + "]");
             }
 
@@ -946,50 +944,7 @@ public class GitCommand {
      *          If it fails...
      */
     public GitFileAnnotation annotate(FilePath filePath) throws VcsException {
-        String[] options = new String[]{"-c", "-C", "-l", "--"};
-        String[] args = new String[]{getRelativeFilePath(filePath.getPath(), vcsRoot)};
-
-        GitFileAnnotation annotation = new GitFileAnnotation(project);
-        String cmdOutput = execute(ANNOTATE_CMD, options, args);
-        if (cmdOutput == null || cmdOutput.length() == 0) return annotation;
-
-        BufferedReader in = new BufferedReader(new StringReader(cmdOutput));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        String Line;
-        try {
-            while ((Line = in.readLine()) != null) {
-                String annValues[] = Line.split("\t", 4);
-                if (annValues.length != 4) {
-                    throw new VcsException("Framing error: unexpected number of values");
-                }
-
-                String revision = annValues[0];
-                String user = annValues[1];
-                String dateStr = annValues[2];
-                String numberedLine = annValues[3];
-
-                if (revision.length() != 40) {
-                    throw new VcsException("Framing error: Illegal revision number: " + revision);
-                }
-
-                int idx = numberedLine.indexOf(')');
-                if (!user.startsWith("(") || idx <= 0) {
-                    continue;
-                }
-                user = user.substring(1).trim(); // Ditch the (
-                Long lineNumber = Long.valueOf(numberedLine.substring(0, idx));
-                String lineContents = numberedLine.substring(idx + 1);
-
-                Date date = dateFormat.parse(dateStr);
-                annotation.appendLineInfo(date, new GitRevisionNumber(revision, date), user, lineContents, lineNumber);
-            }
-
-        } catch (IOException e) {
-            throw new VcsException("Failed to load annotations", e);
-        } catch (ParseException e) {
-            throw new VcsException("Failed to load annotations", e);
-        }
-        return annotation;
+        return new AnnotateFileCommand(executor, versionControlSystem, VfsUtil.virtualToIoFile(vcsRoot), project, getRelativeFilePath(filePath.getPath(), vcsRoot)).execute();
     }
 
     /**
@@ -1187,14 +1142,14 @@ public class GitCommand {
         String cmdStr = null;
         if (DEBUG) {
             cmdStr = StringUtil.join(cmdLine, " ");
-            GitVcs.getInstance(project).showMessages("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
+            GitVcs.getInstance(project).showMessage("DEBUG: work-dir: [" + directory.getAbsolutePath() + "]" +
                     " exec: [" + cmdStr + "]");
         }
 
         if (!silent && !DEBUG) { // dont' print twice in DEBUG mode
             if (cmdStr == null)
                 cmdStr = StringUtil.join(cmdLine, " ");
-            GitVcs.getInstance(project).showMessages("git" + cmdStr.substring(settings.GIT_EXECUTABLE.length()));
+            GitVcs.getInstance(project).showMessage("git" + cmdStr.substring(settings.GIT_EXECUTABLE.length()));
         }
 
         Process proc = null;

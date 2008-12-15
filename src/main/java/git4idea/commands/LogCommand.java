@@ -1,6 +1,7 @@
 package git4idea.commands;
 
 import com.intellij.openapi.vcs.FilePath;
+import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.history.VcsFileRevision;
 import git4idea.GitVcs;
 import git4idea.vfs.GitFileRevision;
@@ -20,7 +21,7 @@ public class LogCommand extends AbstractCommand<List<VcsFileRevision>> {
         this.filePath = filePath;
     }
 
-    protected List<VcsFileRevision> handleCommandOutput(String output) {
+    protected List<VcsFileRevision> handleCommandOutput(String output) throws VcsException {
         String[] parts = output.split("@@@");
 
         List<VcsFileRevision> revisions = new ArrayList<VcsFileRevision>();

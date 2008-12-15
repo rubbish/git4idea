@@ -5,6 +5,8 @@ import git4idea.GitVcs;
 import java.util.List;
 import java.io.File;
 
+import com.intellij.openapi.vcs.VcsException;
+
 
 public class CurrentBranchCommand extends AbstractCommand<String> {
     protected CurrentBranchCommand(CommandExecutor executor, GitVcs versionControlSystem, File workingDirectory) {
@@ -15,7 +17,7 @@ public class CurrentBranchCommand extends AbstractCommand<String> {
         args.add("branch");
     }
 
-    protected String handleCommandOutput(String output) {
+    protected String handleCommandOutput(String output) throws VcsException {
         String[] lines = output.split("[\\n|\\r]");
         for (String line : lines) {
             if (line.startsWith("*")) {

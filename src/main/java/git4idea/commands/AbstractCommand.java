@@ -2,6 +2,7 @@ package git4idea.commands;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.editor.HighlighterColors;
 import git4idea.GitVcs;
 
 import java.io.File;
@@ -30,12 +31,12 @@ public abstract class AbstractCommand<T> implements Command<T> {
 
     protected abstract void addAdditionalArguments(List<String> args);
 
-    protected abstract T handleCommandOutput(String output);
+    protected abstract T handleCommandOutput(String output) throws VcsException;
 
     private void log(List<String> args) {
         List<String> commands = new ArrayList<String>();
         commands.add("git");
         commands.addAll(args);
-        versionControlSystem.showMessages(StringUtil.join(commands, " "));
+        versionControlSystem.showMessage(StringUtil.join(commands, " "));
     }
 }

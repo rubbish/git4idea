@@ -70,7 +70,7 @@ public class GitCommandRunnable implements Runnable {
             GitCommand c = new GitCommand(project, settings, vcsRoot);
             output = c.execute(cmd, opts, args, silent);
             if(!silent) {
-                GitVcs.getInstance(project).showMessages(output);
+                GitVcs.getInstance(project).showMessage(output);
             }
         } catch (VcsException e) {
             vcsEx = e;
