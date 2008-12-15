@@ -789,8 +789,7 @@ public class GitCommand {
      */
     public boolean status(VirtualFile file) throws VcsException {
         String path = getRelativeFilePath(file, GitUtil.getVcsRoot(project, file));
-        String output = execute(STATUS_CMD, path);
-        return !(output == null || output.length() == 0) && output.contains(path);
+        return new IsUnderVersionControlCommand(executor, versionControlSystem, VfsUtil.virtualToIoFile(vcsRoot), path).execute();
     }
 
     /**

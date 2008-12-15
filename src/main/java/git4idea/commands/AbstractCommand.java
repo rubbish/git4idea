@@ -2,15 +2,17 @@ package git4idea.commands;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.editor.HighlighterColors;
 import git4idea.GitVcs;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 public abstract class AbstractCommand<T> implements Command<T> {
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("[MM/dd/yyyy HH:mm:ss]");
     private CommandExecutor executor;
     private GitVcs versionControlSystem;
     private File workingDirectory;
@@ -37,6 +39,6 @@ public abstract class AbstractCommand<T> implements Command<T> {
         List<String> commands = new ArrayList<String>();
         commands.add("git");
         commands.addAll(args);
-        versionControlSystem.showMessage(StringUtil.join(commands, " "));
+        versionControlSystem.showMessage(dateFormatter.format(new Date()) + " " + StringUtil.join(commands, " "));
     }
 }
