@@ -120,8 +120,7 @@ public class AnnotateFileCommandTest extends TestCase {
         verify(executor).execute(workingDirectory, commands);
     }
 
-    // TODO - this test NEEDS to pass eventually, need to consult with someone on how to fix the regex to handle this case...
-    public void FAILING_test_execute_SourceCodeHasAPatternSimilarToTheLineNumber() throws VcsException {
+    public void test_execute_SourceCodeHasAPatternSimilarToTheLineNumber() throws VcsException {
         String output = "0000000000000000000000000000000000000000\t(Not Committed Yet\t2008-12-14 19:48:03 -0600\t1)        String output = \"0b935a6299b732aa56c92e2d42188918f3ed130c        (Luke Amdor     2008-12-08 18:06:21 -0600       1)<?xml version=\\\"1.0\\\"?>";
 
         List<String> commands = Arrays.asList(
