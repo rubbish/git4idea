@@ -35,10 +35,7 @@ import git4idea.GitVcs;
 import git4idea.actions.GitBranch;
 import git4idea.config.GitVcsSettings;
 import git4idea.providers.GitFileAnnotation;
-import git4idea.vfs.GitContentRevision;
-import git4idea.vfs.GitFileRevision;
-import git4idea.vfs.GitRevisionNumber;
-import git4idea.vfs.GitVirtualFile;
+import git4idea.vfs.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -97,6 +94,7 @@ public class GitCommand {
     private VirtualFile vcsRoot;
     private GitVcs versionControlSystem;
     private CommandExecutor executor = new CommandExecutor();
+    private VirtualFileUtilImpl virtualFileUtil = new VirtualFileUtilImpl();
 
     public GitCommand(@NotNull final Project project, @NotNull GitVcsSettings settings, @NotNull VirtualFile vcsRoot) {
         this.vcsRoot = vcsRoot;
@@ -418,20 +416,7 @@ public class GitCommand {
     public void add(VirtualFile[] files) throws VcsException {
         gitWriteLock.lock();
         try {
-            String[] args = new String[files.length];
-            int count = 0;
-            for (VirtualFile file : files) {
-                if (file instanceof GitVirtualFile) {   // don't try to add already deleted files...
-                    GitVirtualFile gvf = (GitVirtualFile) file;
-                    if (gvf.getStatus() == GitVirtualFile.Status.DELETED)
-                        continue;
-                }
-                if (file != null)
-                    args[count++] = getRelativeFilePath(file, vcsRoot);
-            }
-
-            String result = execute(ADD_CMD, (String[]) null, args);
-            GitVcs.getInstance(project).showMessage(result);
+            new AddFileCommand(executor, versionControlSystem, virtualFileUtil, VfsUtil.virtualToIoFile(vcsRoot), vcsRoot, files).execute();
         } finally {
             gitWriteLock.unlock();
         }

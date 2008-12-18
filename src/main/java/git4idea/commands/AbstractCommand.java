@@ -39,6 +39,10 @@ public abstract class AbstractCommand<T> implements Command<T> {
         List<String> commands = new ArrayList<String>();
         commands.add("git");
         commands.addAll(args);
-        versionControlSystem.showMessage(dateFormatter.format(new Date()) + " " + StringUtil.join(commands, " "));
+        log(StringUtil.join(commands, " "));
+    }
+
+    protected void log(String message) {
+        versionControlSystem.showMessage(dateFormatter.format(new Date()) + " " + message);
     }
 }
