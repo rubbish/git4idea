@@ -22,20 +22,9 @@ import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.VcsRoot;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.vcsUtil.VcsUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Collection;
-
-import git4idea.vfs.GitFileSystem;
+import java.util.*;
 
 /**
  * Git utility/helper methods
@@ -44,11 +33,32 @@ public class GitUtil {
 
     @NotNull
     public static VirtualFile getVcsRoot(@NotNull final Project project, @NotNull final FilePath filePath) {
-        VirtualFile vfile = VcsUtil.getVcsRootFor(project, filePath);
-        if (vfile == null)
-            vfile = GitFileSystem.getInstance().findFileByPath(project, filePath.getPath());
+        VirtualFile projectBaseDir = project.getBaseDir();
+        if (containsGitDir(projectBaseDir.getChildren())) {
+            return projectBaseDir;
+        }
+        VirtualFile parentDir = projectBaseDir.getParent();
+        if (parentDir == null) {
+            throw new IllegalArgumentException("Unable to locate the git repository for " + project.getName());
+        }
 
-        return vfile;
+        while (!containsGitDir(parentDir.getChildren())) {
+            parentDir = parentDir.getParent();
+            if (parentDir == null) {
+                throw new IllegalArgumentException("Unable to locate the git repository for " + project.getName());
+            }
+        }
+
+        return parentDir;
+    }
+
+    private static boolean containsGitDir(VirtualFile[] files) {
+        for (VirtualFile file : files) {
+            if (".git".equals(file.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @NotNull
@@ -88,12 +98,12 @@ public class GitUtil {
         return result;
     }
 
-     @NotNull
+    @NotNull
     public static Map<VirtualFile, List<VirtualFile>> sortFilesByVcsRoot(
-              @NotNull Project project,
+            @NotNull Project project,
             @NotNull Collection<VirtualFile> virtualFiles) {
-         return sortFilesByVcsRoot(project, new LinkedList<VirtualFile>(virtualFiles));
-     }
+        return sortFilesByVcsRoot(project, new LinkedList<VirtualFile>(virtualFiles));
+    }
 
     @NotNull
     public static Map<VirtualFile, List<VirtualFile>> sortFilesByVcsRoot(Project project, VirtualFile[] affectedFiles) {
@@ -103,9 +113,9 @@ public class GitUtil {
     @NotNull
     public static Set<VirtualFile> getVcsRootsForFiles(Project project, VirtualFile[] affectedFiles) {
         Set<VirtualFile> roots = new HashSet<VirtualFile>();
-        for(VirtualFile file: affectedFiles ) {
-            if(file == null) continue;
-            roots.add(getVcsRoot(project,file));
+        for (VirtualFile file : affectedFiles) {
+            if (file == null) continue;
+            roots.add(getVcsRoot(project, file));
         }
         return roots;
     }
