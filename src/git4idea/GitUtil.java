@@ -18,9 +18,6 @@ package git4idea;
  */
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.FilePath;
-import com.intellij.openapi.vcs.ProjectLevelVcsManager;
-import com.intellij.openapi.vcs.VcsRoot;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,24 +29,24 @@ import java.util.*;
 public class GitUtil {
 
     @NotNull
-    public static VirtualFile getVcsRoot(@NotNull final Project project, @NotNull final FilePath filePath) {
-        VirtualFile projectBaseDir = project.getBaseDir();
-        if (containsGitDir(projectBaseDir.getChildren())) {
-            return projectBaseDir;
-        }
-        VirtualFile parentDir = projectBaseDir.getParent();
-        if (parentDir == null) {
+    public static VirtualFile getVcsRoot(@NotNull final Project project) {
+        VirtualFile gitRootDir = locateGitRepository(project.getBaseDir());
+        if (gitRootDir == null) {
             throw new IllegalArgumentException("Unable to locate the git repository for " + project.getName());
         }
+        return gitRootDir;
+    }
 
-        while (!containsGitDir(parentDir.getChildren())) {
-            parentDir = parentDir.getParent();
-            if (parentDir == null) {
-                throw new IllegalArgumentException("Unable to locate the git repository for " + project.getName());
-            }
+    private static VirtualFile locateGitRepository(VirtualFile dir) {
+        if (dir == null) {
+            return null;
         }
 
-        return parentDir;
+        if (containsGitDir(dir.getChildren())) {
+            return dir;
+        } else {
+            return locateGitRepository(dir.getParent());
+        }
     }
 
     private static boolean containsGitDir(VirtualFile[] files) {
@@ -63,18 +60,7 @@ public class GitUtil {
 
     @NotNull
     public static VirtualFile getVcsRoot(@NotNull final Project project, @NotNull final VirtualFile virtualFile) {
-        String vpath = virtualFile.getPath();
-        ProjectLevelVcsManager mgr = ProjectLevelVcsManager.getInstance(project);
-        VcsRoot[] vroots = mgr.getAllVcsRoots();
-        for (VcsRoot vroot : vroots) {
-            if (vroot == null) continue;
-            String rootpath = vroot.path.getPath();
-            if (vpath.startsWith(rootpath))
-                return vroot.path;
-        }
-
-        // best guess....
-        return vroots[0].path;
+        return getVcsRoot(project);
     }
 
     @NotNull

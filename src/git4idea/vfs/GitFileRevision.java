@@ -16,26 +16,25 @@ package git4idea.vfs;
  *
  * This code was originally derived from the MKS & Mercurial IDEA VCS plugins
  */
-import git4idea.commands.GitCommand;
-import git4idea.vfs.GitRevisionNumber;
-import git4idea.config.GitVcsSettings;
-import git4idea.GitUtil;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.history.VcsFileRevision;
 import com.intellij.openapi.vcs.history.VcsRevisionNumber;
+import git4idea.GitUtil;
+import git4idea.commands.GitCommand;
+import git4idea.config.GitVcsSettings;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Date;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 /**
  * Git file revision
  */
-public class GitFileRevision implements VcsFileRevision,Comparable<VcsFileRevision> {
+public class GitFileRevision implements VcsFileRevision, Comparable<VcsFileRevision> {
     private FilePath path;
     private GitRevisionNumber revision;
     private String author;
@@ -86,7 +85,7 @@ public class GitFileRevision implements VcsFileRevision,Comparable<VcsFileRevisi
 
     @Override
     public void loadContent() throws VcsException {
-        GitCommand command = new GitCommand(project, GitVcsSettings.getInstance(project), GitUtil.getVcsRoot(project, path));
+        GitCommand command = new GitCommand(project, GitVcsSettings.getInstance(project), GitUtil.getVcsRoot(project));
         String c = command.getContents(path.getPath(), revision.getRev());
         if (c != null && c.length() > 0) {
             content = c.getBytes();
@@ -109,12 +108,12 @@ public class GitFileRevision implements VcsFileRevision,Comparable<VcsFileRevisi
 
     @Override
     public int compareTo(VcsFileRevision rev) {
-        if(rev instanceof GitFileRevision)
-            return revision.compareTo(((GitFileRevision)rev).revision);
+        if (rev instanceof GitFileRevision)
+            return revision.compareTo(((GitFileRevision) rev).revision);
         return getRevisionDate().compareTo(rev.getRevisionDate());
     }
 
-    public FilePath getFilePath(){
+    public FilePath getFilePath() {
         return path;
     }
 }

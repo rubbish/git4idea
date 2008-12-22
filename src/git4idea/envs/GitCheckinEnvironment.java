@@ -147,7 +147,7 @@ public class GitCheckinEnvironment implements CheckinEnvironment {
         } else {
             command.run();
         }
-        
+
         return exceptions;
     }
 

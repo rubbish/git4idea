@@ -26,7 +26,7 @@ public class GitUtilTest extends TestCase {
         when(project.getBaseDir()).thenReturn(projectBaseDir);
         when(projectBaseDir.getChildren()).thenReturn(new VirtualFile[]{gitDir});
 
-        VirtualFile vcsRoot = GitUtil.getVcsRoot(project, filePath);
+        VirtualFile vcsRoot = GitUtil.getVcsRoot(project);
 
         assertNotNull(vcsRoot);
         assertSame(projectBaseDir, vcsRoot);
@@ -43,7 +43,7 @@ public class GitUtilTest extends TestCase {
         when(projectBaseDir.getParent()).thenReturn(parentDir);
         when(parentDir.getChildren()).thenReturn(new VirtualFile[]{gitDir});
 
-        VirtualFile vcsRoot = GitUtil.getVcsRoot(project, filePath);
+        VirtualFile vcsRoot = GitUtil.getVcsRoot(project);
 
         assertNotNull(vcsRoot);
         assertSame(parentDir, vcsRoot);
@@ -61,7 +61,7 @@ public class GitUtilTest extends TestCase {
         when(projectBaseDir.getParent()).thenReturn(null);
 
         try {
-            GitUtil.getVcsRoot(project, filePath);
+            GitUtil.getVcsRoot(project);
             fail();
         } catch (IllegalArgumentException err) {
             assertEquals("Unable to locate the git repository for project-name", err.getMessage());
@@ -84,7 +84,7 @@ public class GitUtilTest extends TestCase {
         when(parentDir.getParent()).thenReturn(parentsParentDir);
         when(parentsParentDir.getChildren()).thenReturn(new VirtualFile[]{gitDir});
 
-        VirtualFile vcsRoot = GitUtil.getVcsRoot(project, filePath);
+        VirtualFile vcsRoot = GitUtil.getVcsRoot(project);
 
         assertNotNull(vcsRoot);
         assertSame(parentsParentDir, vcsRoot);
@@ -108,7 +108,7 @@ public class GitUtilTest extends TestCase {
         when(parentDir.getParent()).thenReturn(null);
 
         try {
-            GitUtil.getVcsRoot(project, filePath);
+            GitUtil.getVcsRoot(project);
             fail();
         } catch (IllegalArgumentException err) {
             assertEquals("Unable to locate the git repository for project-name", err.getMessage());
