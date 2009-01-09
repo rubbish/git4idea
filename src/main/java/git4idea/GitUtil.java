@@ -19,6 +19,7 @@ package git4idea;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vcs.FilePath;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -60,6 +61,11 @@ public class GitUtil {
 
     @NotNull
     public static VirtualFile getVcsRoot(@NotNull final Project project, @NotNull final VirtualFile virtualFile) {
+        return getVcsRoot(project);
+    }
+
+    @NotNull
+    public static VirtualFile getVcsRoot(@NotNull final Project project, @NotNull final FilePath filePath) {
         return getVcsRoot(project);
     }
 
