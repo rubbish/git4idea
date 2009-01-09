@@ -56,7 +56,6 @@ public class GitCommandRunnable implements Runnable {
     }
 
     @SuppressWarnings({"EmptyCatchBlock"})
-    @Override
     public void run() {
         if (cmd == null) throw new IllegalStateException("No command set!");
         vcsEx = null;

@@ -45,7 +45,6 @@ public class GitRevisionNumber implements VcsRevisionNumber {
         this.revisionStr = version;
     }
 
-    @Override
     public String asString() {
         return revisionStr;
     }
@@ -68,7 +67,6 @@ public class GitRevisionNumber implements VcsRevisionNumber {
         return revisionStr;
     } 
 
-    @Override
     public int compareTo(VcsRevisionNumber crev) {
         if (this == crev) return 0;
 

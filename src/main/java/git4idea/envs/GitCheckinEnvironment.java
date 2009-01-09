@@ -27,6 +27,7 @@ import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
+import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.checkin.CheckinEnvironment;
 import com.intellij.openapi.vcs.ui.RefreshableOnComponent;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -67,19 +68,16 @@ public class GitCheckinEnvironment implements CheckinEnvironment {
         this.settings = settings;
     }
 
-    @Override
     @Nullable
     public RefreshableOnComponent createAdditionalOptionsPanel(CheckinProjectPanel panel) {
         return null;
     }
 
-    @Override
     @Nullable
     public String getDefaultMessageFor(FilePath[] filesToCheckin) {
         return "\n# Brief commit desciption here\n\n# Full commit description here (comment lines starting with '#' will not be included)\n\n";
     }
 
-    @Override
     public String prepareCheckinMessage(String text) {
         return null;
     }
@@ -89,18 +87,15 @@ public class GitCheckinEnvironment implements CheckinEnvironment {
         return null;
     }
 
-    @Override
     public String getCheckinOperationName() {
         return "Commit";
     }
 
-    @Override
     public boolean showCheckinDialogInAnyCase() {
         return true;
     }
 
     @SuppressWarnings({"ConstantConditions"})
-    @Override
     public List<VcsException> commit(@NotNull final List<Change> changes, @NotNull final String message) {
         final int changeCount = changes.size();
         final List<VcsException> exceptions = new ArrayList<VcsException>(changeCount);
@@ -151,7 +146,6 @@ public class GitCheckinEnvironment implements CheckinEnvironment {
         return exceptions;
     }
 
-    @Override
     public List<VcsException> scheduleMissingFileForDeletion(List<FilePath> files) {
         try {
             VirtualFile[] vfiles = new VirtualFile[files.size()];
@@ -166,7 +160,6 @@ public class GitCheckinEnvironment implements CheckinEnvironment {
         }
     }
 
-    @Override
     public List<VcsException> scheduleUnversionedFilesForAddition(List<VirtualFile> files) {
         try {
             Add.addFiles(project, files.toArray(new VirtualFile[files.size()]));
@@ -174,6 +167,10 @@ public class GitCheckinEnvironment implements CheckinEnvironment {
         } catch (VcsException e) {
             return Collections.singletonList(e);
         }
+    }
+
+    public boolean keepChangeListAfterCommit(ChangeList changeList) {
+        return true;
     }
 
     private Map<VirtualFile, List<Change>> sortChangesByVcsRoot(@NotNull List<Change> changes) {

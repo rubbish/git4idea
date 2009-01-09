@@ -46,13 +46,11 @@ public class GitRollbackEnvironment implements RollbackEnvironment {
         this.project = project;
     }
 
-    @Override
     @NotNull
     public String getRollbackOperationName() {
         return "Revert";
     }
 
-    @Override
     public List<VcsException> rollbackModifiedWithoutCheckout(@NotNull List<VirtualFile> files) {
        List<VcsException> exceptions = new LinkedList<VcsException>();
         final Map<VirtualFile, List<VirtualFile>> roots = GitUtil.sortFilesByVcsRoot(project, files);
@@ -75,16 +73,13 @@ public class GitRollbackEnvironment implements RollbackEnvironment {
         return exceptions;
     }
 
-    @Override
     public List<VcsException> rollbackMissingFileDeletion(@NotNull List<FilePath> files) {
         return null;
     }
 
-    @Override
     public void rollbackIfUnchanged(@NotNull VirtualFile file) {
     }
 
-    @Override
     public List<VcsException> rollbackChanges(@NotNull List<Change> changes) {
         List<VirtualFile> affectedFiles = new ArrayList<VirtualFile>(changes.size());
         for(Change change: changes) {

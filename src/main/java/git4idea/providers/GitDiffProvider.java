@@ -19,6 +19,7 @@ package git4idea.providers;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.diff.DiffProvider;
+import com.intellij.openapi.vcs.diff.ItemLatestState;
 import com.intellij.openapi.vcs.history.VcsRevisionNumber;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
@@ -40,19 +41,17 @@ public class GitDiffProvider implements DiffProvider {
         project = proj;
     }
 
-    @Override
     @Nullable
     public VcsRevisionNumber getCurrentRevision(VirtualFile file) {
         return new GitRevisionNumber(GitRevisionNumber.TIP, new Date());
     }
 
-    @Override
     @Nullable
-    public VcsRevisionNumber getLastRevision(VirtualFile file) {
-        return new GitRevisionNumber(GitRevisionNumber.TIP, new Date(file.getModificationStamp()));
+    public ItemLatestState getLastRevision(VirtualFile file) {
+        return new ItemLatestState(new GitRevisionNumber(GitRevisionNumber.TIP, new Date(file.getModificationStamp())), 
+                file.exists());
     }
 
-    @Override
     @Nullable
     public ContentRevision createFileContent(VcsRevisionNumber revisionNumber, VirtualFile selectedFile) {
         GitVirtualFile file;

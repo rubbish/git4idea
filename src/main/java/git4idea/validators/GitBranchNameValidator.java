@@ -23,14 +23,14 @@ import com.intellij.openapi.ui.InputValidator;
  * Git branch name validator
  */
 public class GitBranchNameValidator implements InputValidator {
-    @Override
+
     public boolean checkInput(String inputString) {
         return !(inputString == null || inputString.length() == 0);
         //TODO: actually validate branch names...
         //return inputString.matches("^[a-zA-Z]+$-.");
     }
 
-    @Override
+
     public boolean canClose(String inputString) {
         return checkInput(inputString);
     }

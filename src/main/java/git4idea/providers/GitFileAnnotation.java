@@ -138,10 +138,6 @@ public class GitFileAnnotation implements FileAnnotation {
         return myContentBuffer.toString();
     }
 
-    public LineInfo getLineInfo(int lineNumber) {
-        return myLineInfos.get(lineNumber);
-    }
-
     public VcsRevisionNumber getLineRevisionNumber(int i) {
         return myLineInfos.get(i).getRevision();  //To change body of implemented methods use File | Settings | File Templates.
     }

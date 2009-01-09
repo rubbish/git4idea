@@ -49,12 +49,10 @@ public class GitVcsSettings implements PersistentStateComponent<GitVcsSettings> 
         GIT_EXECUTABLE = locationOfGit();
     }
 
-    @Override
     public GitVcsSettings getState() {
         return this;
     }
 
-    @Override
     public void loadState(GitVcsSettings gitVcsSettings) {
         XmlSerializerUtil.copyBean(gitVcsSettings, this);
     }
