@@ -1,6 +1,7 @@
 The Backlog (in personal order of priority)
 
 [ ] (BUG) Removing an unversioned file still tries to remove it from Git
+[ ] (BUG) Show diff doesn't show and difference (isn't doing "--cached")
 [ ] (Feature) Git Reset
 [ ] (Feature) Show unversioned files as a changelist
 [ ] (Refactor) Come up with a prettier way of shelling out commands
@@ -9,5 +10,6 @@ The Backlog (in personal order of priority)
 [ ] (Feature) Git SVN dcommit
 [ ] (Feature) Git Branch History
 [ ] (Feature) Git Interactive Rebase
+[ ] (Feature) Git Revert
 [ ] (Feature) Git Add Patch (git add -p)
 [ ] (Refactor) Use JGit
