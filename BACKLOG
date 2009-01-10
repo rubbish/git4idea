@@ -2,8 +2,11 @@ The Backlog (in personal order of priority)
 
 [ ] (BUG) Removing an unversioned file still tries to remove it from Git
 [ ] (Feature) Git Reset
+[ ] (Feature) Show unversioned files as a changelist
 [ ] (Refactor) Come up with a prettier way of shelling out commands
 [ ] (Feature) Git Rebase
+[ ] (Feature) Git SVN Rebase
+[ ] (Feature) Git SVN dcommit
 [ ] (Feature) Git Branch History
 [ ] (Feature) Git Interactive Rebase
 [ ] (Feature) Git Add Patch (git add -p)
