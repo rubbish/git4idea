@@ -27,11 +27,8 @@ import git4idea.vfs.GitRevisionNumber;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Git file annotation implementation
@@ -57,6 +54,14 @@ public class GitFileAnnotation implements FileAnnotation {
         }
     };
 
+    public LineInfo getLineInfo(int index) {
+        return myLineInfos.get(index);
+    }
+
+    public List<LineInfo> getLineInfos() {
+        return Collections.unmodifiableList(myLineInfos);
+    }
+
     private final LineAnnotationAspect REVISION_ASPECT = new RevisionAnnotationAspect();
 
     private final LineAnnotationAspect AUTHOR_ASPECT = new LineAnnotationAspect() {
@@ -75,7 +80,7 @@ public class GitFileAnnotation implements FileAnnotation {
         }
     }
 
-    static class LineInfo {
+    public static class LineInfo {
         private final Date myDate;
         private final GitRevisionNumber myRevision;
         private final String myAuthor;

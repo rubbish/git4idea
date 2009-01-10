@@ -2,6 +2,7 @@ package git4idea.commands;
 
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.project.Project;
 import git4idea.GitVcs;
 import git4idea.config.GitVcsSettings;
 import git4idea.vfs.GitVirtualFile;
@@ -73,7 +74,7 @@ public class AddFileCommandTest extends TestCase {
     }
 
     private VirtualFile createVirtualFile(String name) {
-        return new GitVirtualFile(null, name);
+        return new GitVirtualFile(mock(Project.class), name);
     }
 
 }
